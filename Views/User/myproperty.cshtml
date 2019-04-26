@@ -1,0 +1,189 @@
+﻿@model ClassLibrary.WebModels.UserMyPropertiesModel
+@{
+    ViewBag.Title = "myproperty";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    My Properties
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="pad1"></div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Add Property</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <a href="/User/addproperty" class="btn btn-lg edit add-property-icon-btn" style="display:block;"><i class="fa fa-plus"></i> Add a Property</a>
+            </div>
+        </div>
+
+        <div class="pad1"></div>
+        <br><br>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Existing Properties</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="div-user-properties">
+            @Html.Partial("~/Views/User/_pv_User_Myproperties_list.cshtml", Model)
+        </div><!-- /row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-user-myproperties-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.UserMyPropertiesPaginationModel();
+                        model.currenttIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                    }
+                    @Html.Partial("~/Views/User/_pv_UserMypropertiesPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+<script>
+
+    $(document).on('click', '.user-delete-property', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var userId = $(source).attr('data-userId');
+            var propertyId = $(source).attr('data-propertyId');
+            var obj = new Object();
+            obj.propertyId = propertyId;
+            obj.userId = userId;
+
+            $.ajax({
+                url: '/User/removePropertyFromList',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            RefreshList();
+                        }, 200);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+    function RefreshList() {
+        var index = $('#index').val();
+        var obj = new Object();
+        obj.index = index;
+
+        $.ajax({
+            url: '/User/RefreshViewPropertiesList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-properties').html(data);
+            }
+        });
+    }
+
+    $(document).on('click', '.a-user-myproperty-pageChange-prev', function () {
+
+        var index = $('#index').val();
+        var obj = new Object();
+        obj.index = parseInt(index) - parseInt(1);
+
+        $.ajax({
+            url: '/User/RefreshViewPropertiesList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-properties').html(data);
+                $('#index').val(parseInt(index) - parseInt(1));
+                var newobj = new Object();
+                newobj.currenttIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+
+                $.ajax({
+                    url: '/User/RefreshViewPropertiesList',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myproperties-pagination').html(result);
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.a-user-myproperty-pageChange-next', function () {
+
+        var index = $('#index').val();
+        var obj = new Object();
+        obj.index = parseInt(index) + parseInt(1);
+
+        $.ajax({
+            url: '/User/RefreshViewPropertiesList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-properties').html(data);
+                $('#index').val(parseInt(index) + parseInt(1));
+                var newobj = new Object();
+                newobj.currenttIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+
+                $.ajax({
+                    url: '/User/RefreshViewPropertiesListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myproperties-pagination').html(result);
+                    }
+                });
+            }
+        });
+
+    });
+
+</script>

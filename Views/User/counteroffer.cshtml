@@ -1,0 +1,276 @@
+﻿@model ClassLibrary.WebModels.UserJobCounterOfferModel
+@{
+    ViewBag.Title = "counteroffer";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+@Html.HiddenFor(m => m.userId, new { Value = Model.userId })
+@Html.HiddenFor(m => m.jobId, new { Value = Model.jobId })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    Counter Offer
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="personal-details">
+                    <img src="~/Content/images/icons/personal-details.png" />
+                    <span>Counter Offer List</span>
+                </div><!-- /personal-details -->
+
+                <div class="row" id="div-job-counteroffer">
+                    @Html.Partial("~/Views/User/_pv_User_Counteroffer_list.cshtml", Model)
+                </div><!-- /row -->
+            </div><!-- /col-lg-12 col-md-12 col-sm-12 col-xs-12 -->
+
+        </div><!-- /row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-userjob-counterOffer-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.UserJobCounterOfferPaginationModel();
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.jobId = Model.jobId;
+                        model.userId = Model.userId;
+                    }
+                    @Html.Partial("~/Views/User/_pv_UserJob_CounterOfferPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+<script>
+
+    $(document).on('click', '.a-user-counterOfferDelete', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var userId = $(source).attr('data-userId');
+            var counterOfferId = $(source).attr('data-counterOfferId');
+            var obj = new Object();
+            obj.userId = userId;
+            obj.counterOfferId = counterOfferId;
+            $.ajax({
+                url: '/User/userDeleteCounterOffer',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            RefreshList();
+                        }, 300);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+    function RefreshList() {
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var jobId = $('#jobId').val();
+        var obj = new Object();
+        obj.index = index;
+        obj.userId = userId;
+        obj.jobId = jobId;
+
+        //$.ajax({
+        //    url: '/User/GetCounterOfferCount',
+        //    type: "POST",
+        //    data: obj,
+        //    dataType: 'html',
+        //    success: function (data) {
+        //        $.ajax({
+        //            url: '/User/RefreshViewPropertiesList',
+        //            type: "POST",
+        //            data: obj,
+        //            dataType: 'html',
+        //            success: function (data) {
+        //                $('#div-user-properties').html(data);
+        //            }
+        //        });
+        //    }
+        //});
+
+        $.ajax({
+            url: '/User/checkCounterOfferListCount',
+            type: "POST",
+            dataType: 'json',
+            data: obj,
+            success: function (data) {
+                if (data.Status) {
+                    $.ajax({
+                        url: '/User/RefreshCounterOfferList',
+                        type: "POST",
+                        data: obj,
+                        dataType: 'html',
+                        success: function (result) {
+                            $('#div-job-counteroffer').html(result);
+                        }
+                    });
+                }
+                else {
+
+                    $('#index').val(parseInt(index) - parseInt(1))
+                    var newindex = $('#index').val();
+                    var newobj = new Object();
+                    newobj.index = newindex;
+                    newobj.userId = userId;
+                    newobj.jobId = jobId;
+
+                    $.ajax({
+                        url: '/User/RefreshCounterOfferList',
+                        type: "POST",
+                        data: newobj,
+                        dataType: 'html',
+                        success: function (result) {
+                            $('#div-job-counteroffer').html(result);
+                        }
+                    });
+                }
+            }
+        });
+
+
+
+    }
+
+
+    $(document).on('click', '.a-user-jobCounteroffer-pageChange-next', function () {
+
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var jobId = $('#jobId').val();
+        var obj = new Object();
+        obj.index = parseInt(index) + parseInt(1);
+        obj.userId = userId;
+        obj.jobId = jobId;
+
+        $.ajax({
+            url: '/User/RefreshCounterOfferList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-job-counteroffer').html(data);
+
+                var newobj = new Object();
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.userId = userId;
+                newobj.jobId = jobId;
+                $.ajax({
+                    url: '/User/RefreshCounterOfferListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-userjob-counterOffer-pagination').html(result);
+                        $('#index').val(parseInt(index) + parseInt(1));
+                    }
+                });
+            }
+        });
+
+    });
+
+    $(document).on('click', '.a-user-jobCounteroffer-pageChange-prev', function () {
+
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var jobId = $('#jobId').val();
+        var obj = new Object();
+        obj.index = parseInt(index) - parseInt(1);
+        obj.userId = userId;
+        obj.jobId = jobId;
+
+        $.ajax({
+            url: '/User/RefreshCounterOfferList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-job-counteroffer').html(data);
+
+                var newobj = new Object();
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.userId = userId;
+                newobj.jobId = jobId;
+                $.ajax({
+                    url: '/User/RefreshCounterOfferListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-userjob-counterOffer-pagination').html(result);
+                        $('#index').val(parseInt(index) - parseInt(1));
+                    }
+                });
+            }
+        });
+
+    });
+
+    $(document).on('click', '.a-user-counterOfferAccept', function () {
+
+        var source = $(this);
+        var userId = $(source).attr('data-userId');
+        var counterOfferId = $(source).attr('data-counterOfferId');
+        var obj = new Object();
+        obj.userId = userId;
+        obj.counterOfferId = counterOfferId;
+
+        $.ajax({
+            url: '/User/acceptCounterOffer',
+            type: "POST",
+            dataType: 'json',
+            data: obj,
+            success: function (data) {
+                if (data.Status) {
+                    toastr.success(data.Message);
+                    setTimeout(function () {
+                        window.location.href = "/User/myjobs";
+                    }, 300);
+                }
+                else {
+                    toastr.error(data.Message);
+                }
+            }
+        });
+
+    });
+
+
+</script>

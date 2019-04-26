@@ -1,0 +1,267 @@
+﻿@model ClassLibrary.WebModels.ViewAllJobs
+@{
+    ViewBag.Title = "alljobsdetails";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var userData = new EntitiesLibrary.Data.Registration();
+    if (Model.cleanerId == 0)
+    {
+        userData = new EntitiesLibrary.Data.Registration(Model.companyId);
+    }
+    else
+    {
+        userData = new EntitiesLibrary.Data.Registration(Model.cleanerId);
+    }
+    //var cleanerData = new EntitiesLibrary.Data.Registration(Model.cleanerId);
+    Tuple<bool, string, long, long, long, List<EntitiesLibrary.Data.Job>, decimal, Tuple<decimal, decimal, decimal>> t = new EntitiesLibrary.Data.WebService().getcleanerjobsadmin(Model);
+}
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.All, new { Value = Model.All })
+@Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+@Html.HiddenFor(m => m.endDate, new { Value = Model.endDate })
+@Html.HiddenFor(m => m.startDate, new { Value = Model.startDate })
+@Html.HiddenFor(m => m.TimeZone, new { Value = Model.TimeZone })
+@Html.HiddenFor(m => m.companyId, new { Value = Model.companyId })
+@Html.HiddenFor(m => m.propertyId, new { Value = Model.propertyId })
+@Html.HiddenFor(m => m.workType, new { Value = Model.workType })
+@Html.HiddenFor(m => m.isCompany, new { Value = Model.isCompany })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @if (userData != null)
+                {
+                    if (Convert.ToBoolean(Model.isCompany))
+                    {
+                        if ((userData.CompanyName != null && userData.CompanyName != string.Empty))
+                        {
+                            <div class="innr-pg-ttle">
+                                @(userData.CompanyName ?? string.Empty)
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                        else
+                        {
+                            <div class="innr-pg-ttle">
+                                &nbsp;
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                    }
+                    else
+                    {
+                        if ((userData.FirstName != null && userData.FirstName != string.Empty) || (userData.LastName != null && userData.LastName != string.Empty))
+                        {
+                            <div class="innr-pg-ttle">
+                                @(userData.FirstName ?? string.Empty + " " + userData.LastName ?? string.Empty)
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                        else
+                        {
+                            <div class="innr-pg-ttle">
+                                &nbsp;
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                    }
+                }
+                else
+                {
+                    <div class="innr-pg-ttle">
+                        &nbsp;
+                    </div><!-- /innr-pg-ttle -->
+                }
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="form-pad"></div>
+
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <ul class="details-info">
+                    <li><span>All Jobs</span>: <b>@(t.Item1 == true ? String.Format("{0:#}", t.Item3) : "0")</b></li>
+                    <li><span>Completed Jobs</span>: <b>@(t.Item1 == true ? String.Format("{0:#}", t.Item4) : "0")</b></li>
+                    <li><span>Pending Jobs</span>: <b>@(t.Item1 == true ? String.Format("{0:#}", t.Item5) : "0")</b></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <ul class="details-info">
+                    <li class="green-clr">Completed Profit : <b>$@(t.Item1 == true ? String.Format("{0:#}", t.Rest.Item2) : "0")</b></li>
+                    <li class="red-clr">Incompeted profit: <b>$@(t.Item1 == true ? String.Format("{0:#}", t.Rest.Item3) : "0")</b></li>
+                    <li class="green-clr">Amount Completed: <b>$@(t.Item1 == true ? String.Format("{0:#}", t.Item7) : "0")</b></li>
+                    <li class="red-clr">Amount Pending: <b>$@(t.Item1 == true ? String.Format("{0:#}", t.Rest.Item1) : "0")</b></li>
+                </ul>
+            </div>
+        </div><!-- /row -->
+
+        <div class="form-pad"></div>
+
+        <div class="row" id="div-cleaner-alljobs">
+            @{
+                var newModel = new ClassLibrary.WebModels.ViewAllJobs();
+                newModel.All = Model.All;
+                newModel.cleanerId = Model.cleanerId;
+                newModel.companyId = Model.companyId;
+                newModel.endDate = Model.endDate;
+                newModel.index = 0;
+                newModel.startDate = Model.startDate;
+                newModel.TimeZone = Model.TimeZone;
+                newModel.workType = Model.workType;
+                newModel.propertyId = Model.propertyId;
+                newModel.isCompany = Model.isCompany;
+                @Html.Partial("~/Views/Cleaner/_pv_allJobs_detail_joblist.cshtml", newModel)
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-cleaner-alljobs-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.CleanerAllJobsModelPagenation();
+                        model.All = Model.All;
+                        model.cleanerId = Model.cleanerId;
+                        model.endDate = Model.endDate;
+                        model.startDate = Model.startDate;
+                        model.TimeZone = Model.TimeZone;
+                        model.cleanerId = Model.cleanerId;
+                        model.currentIndex = 0;
+                        model.nextIndex = 1;
+                        model.workType = Model.workType;
+                        model.propertyId = Model.propertyId;
+                        model.isCompany = Model.isCompany;
+                        model.companyId = Model.companyId;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_CleanerAlljobsPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+<script>
+
+    $(document).on('click', '.a-cleaner-alljob-pageChange-next', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var companyId = $('#companyId').val();
+        var workType = $('#workType').val();
+        var propertyId = $('#propertyId').val();
+        var isCompany = $('#isCompany').val();
+        var endDate = $('#endDate').val();
+        var All = $('#All').val();
+        var startDate = $('#startDate').val();
+        var TimeZone = $('#TimeZone').val();
+        var index = $('#index').val();
+
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) + parseInt(1);
+        obj.endDate = endDate;
+        obj.All = All;
+        obj.startDate = startDate;
+        obj.TimeZone = TimeZone;
+        obj.companyId = companyId;
+        obj.isCompany = isCompany;
+        obj.propertyId = propertyId;
+        obj.workType = workType;
+        $.ajax({
+            url: '/Cleaner/RefreshAllJobList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-alljobs').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.endDate = endDate;
+                newobj.All = All;
+                newobj.startDate = startDate;
+                newobj.TimeZone = TimeZone;
+                newobj.companyId = companyId;
+                newobj.isCompany = isCompany;
+                newobj.propertyId = propertyId;
+                newobj.workType = workType;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshAllJobListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-alljobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-alljob-pageChange-prev', function () {
+
+        var source = $(this);
+        var companyId = $('#companyId').val();
+        var workType = $('#workType').val();
+        var propertyId = $('#propertyId').val();
+        var isCompany = $('#isCompany').val();
+        var cleanerId = $('#cleanerId').val();
+        var endDate = $('#endDate').val();
+        var All = $('#All').val();
+        var startDate = $('#startDate').val();
+        var TimeZone = $('#TimeZone').val();
+        var index = $('#index').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) - parseInt(1);
+        obj.endDate = endDate;
+        obj.All = All;
+        obj.startDate = startDate;
+        obj.TimeZone = TimeZone;
+        obj.companyId = companyId;
+        obj.isCompany = isCompany;
+        obj.propertyId = propertyId;
+        obj.workType = workType;
+        $.ajax({
+            url: '/Cleaner/RefreshAllJobList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-alljobs').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.endDate = endDate;
+                newobj.All = All;
+                newobj.startDate = startDate;
+                newobj.TimeZone = TimeZone;
+                newobj.companyId = companyId;
+                newobj.isCompany = isCompany;
+                newobj.propertyId = propertyId;
+                newobj.workType = workType;
+                $.ajax({
+                    url: '/Cleaner/RefreshAllJobListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-alljobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+</script>

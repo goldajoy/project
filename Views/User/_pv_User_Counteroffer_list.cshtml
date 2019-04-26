@@ -1,0 +1,77 @@
+﻿@model ClassLibrary.WebModels.UserJobCounterOfferModel
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Convert.ToInt64(Model.jobId));
+}
+
+
+@if (job != null)
+{
+    if (job.CounterOffers.Count > 0)
+    {
+        int index = Convert.ToInt32(Model.index);
+        var counterOffers = job.CounterOffers.ToList().Skip(index * 6).Take(6).ToList();
+        if (counterOffers.Count > 0)
+        {
+            foreach (var offer in counterOffers)
+            {
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="cleaner-details">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-5">
+                                @if (offer.CleanerDetails != null)
+                                {
+                                    if (offer.CleanerDetails.ProfilePic != null && offer.CleanerDetails.ProfilePic != string.Empty)
+                                    {
+                                        <img class="img-responsive img-rounded" src="@offer.CleanerDetails.ProfilePic" width="80" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive img-rounded" src="/Content/images/user.png" width="80" />
+                                    }
+                                }
+                                else
+                                {
+                                    <img class="img-responsive img-rounded" src="/Content/images/user.png" width="80" />
+                                }
+                                <div class="rating">
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                </div>
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+                                <h4>
+                                    <strong>
+                                        @(offer.CleanerDetails != null ? offer.CleanerDetails.FirstName ?? string.Empty + " " + offer.CleanerDetails.LastName ?? string.Empty : "")
+                                        <span class="pull-right">$@(offer.Pricestring ?? string.Empty)</span>
+                                    </strong>
+                                </h4>
+                                <div class="">
+                                    <h4>Property Address:</h4>
+                                    <img class="img-responsive" src="~/Content/images/icons/location.png" />
+                                    <h5 style="float:left;">
+                                        @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                    <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)),
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                    <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                </h5>
+                            </div>
+                        </div>
+                    </div><!-- /row -->
+                    <div class="pad1"></div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <a href="/User/counterofferdetail?id=@offer.CounterOfferIdstring&jobid=@offer.JobIdstring" class="btn view-btn" style="width:100%; margin-bottom:5px;">View</a>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <a class="btn edit a-user-counterOfferAccept" data-userid="@(Data==null?"0":Convert.ToString(Data.UserId))" data-counterofferid="@offer.CounterOfferIdstring" style="width:100%; margin-bottom:5px;">Accept</a>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <a class="btn pending-btn a-user-counterOfferDelete" data-userid="@(Data==null?"0":Convert.ToString(Data.UserId))" data-counterofferid="@offer.CounterOfferIdstring" style="width:100%; margin-bottom:5px;">Delete</a>
+                        </div>
+                    </div>
+                </div><!-- /cleaner-details -->
+            </div><!-- /col-lg-6 col-md-6 col-sm-6 col-xs-12 -->
+            }
+        }
+    }
+}

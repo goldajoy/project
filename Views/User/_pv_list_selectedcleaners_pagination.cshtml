@@ -1,0 +1,18 @@
+﻿@model ClassLibrary.WebModels.MyCleanersViewModelUserMyPropertiesPaginationModel
+@{
+    var data = new EntitiesLibrary.Data.WebService().fetchUserSelectedCleaners(Model.userId);
+
+}
+@if (Model.currenttIndex > 0)
+{
+    <li><a class="a-user-selectedcleaner-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (data.Count > 0)
+{
+    int index = Convert.ToInt32(Model.nextIndex);
+    if (data.Skip(index * 6).Take(6).ToList().Count > 0)
+    {
+        <li><a class="a-user-selectedcleaner-pageChange-next" style="cursor:pointer;">Next</a></li>
+    }
+}

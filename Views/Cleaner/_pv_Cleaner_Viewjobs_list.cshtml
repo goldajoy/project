@@ -1,0 +1,60 @@
+﻿@model ClassLibrary.WebModels.CleanerViewJobsFilter
+@{
+    var jobList = new EntitiesLibrary.Data.WebService().cleanerListOpenJobs(Model);
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+
+@if (jobList.Count > 0)
+{
+    foreach (var item in jobList)
+    {
+        <div class="col-md-6">
+            <div class="job">
+                <div class="job-header">
+                    <span class="col-md-4">@((item.PropertyDetail == null ? "" : item.PropertyDetail.Suburb ?? string.Empty))</span>
+                    @if (item.PropertyDetail != null)
+                    {
+                        if (item.PropertyDetail.PropertyTypeId == (int)ClassLibrary.Enum.PropertyType.Airbnb)
+                        {
+                            <span class="btn airbnb-clr center-btns col-md-3">Airbnb</span>
+                        }
+                        else if (item.PropertyDetail.PropertyTypeId == (int)ClassLibrary.Enum.PropertyType.Domestic)
+                        {
+                            <span class="btn domestic-clr center-btns col-md-3">Domestic</span>
+                        }
+                        else if (item.PropertyDetail.PropertyTypeId == (int)ClassLibrary.Enum.PropertyType.Commercial)
+                        {
+                            <span class="btn domestic-clr center-btns col-md-3">Commercial</span>
+                        }
+                    }
+
+                    @*<span class="pull-right text-right col-md-4">$@item.PriceString</span>*@
+                    @if (Data != null)
+                    {
+                        if (Data.IsAdmin)
+                        {
+
+                            <span class="pull-right text-right col-md-4">$@(item.PriceString == "" ? "0" : item.PriceString)</span>
+                        }
+                        else
+                        {
+                            <span class="pull-right text-right col-md-4">$@(item.AdminPriceString==""?"0":item.AdminPriceString)</span>
+
+                        }
+                    }
+                </div><!-- /job-header -->
+                <div class="job-body view-job-grid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="/Cleaner/viewjobdetails/@item.JobIdString" class="btn btn-default view-job-btn view-btn">View Details</a>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="btn btn-default view-job-btn pending-btn cleaner-delete-Userjob" data-jobid="@item.JobId">Delete</a>
+                        </div>
+                    </div><!-- /row -->
+                </div><!-- /job-body-->
+            </div><!-- /job -->
+        </div><!-- /col-md-6 -->
+    }
+}
+

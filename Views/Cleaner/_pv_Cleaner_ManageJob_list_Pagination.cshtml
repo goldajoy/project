@@ -1,0 +1,14 @@
+﻿@model ClassLibrary.WebModels.ManageJobsModelPagenation
+@{
+    var jobListCountIndex = new EntitiesLibrary.Data.WebService().ListAllJobs_Admin_Count(Model);
+}
+
+@if (Model.currentIndex > 0)
+{
+    <li><a class="a-cleaner-managejoblist-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (jobListCountIndex > 0)
+{
+    <li><a class="a-cleaner-managejoblist-pageChange-next" style="cursor:pointer;">Next</a></li>
+}

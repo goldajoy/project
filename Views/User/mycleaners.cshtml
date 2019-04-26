@@ -1,0 +1,606 @@
+﻿@model ClassLibrary.WebModels.MyCleanersViewModel
+@{
+    ViewBag.Title = "mycleaners";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.userId, new { Value = Model.userId })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    My Cleaners
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="pad1"></div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Add Cleaner</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <a class="btn btn-lg edit add-property-icon-btn" data-toggle="modal" data-target="#myModal" style="display:block;"><i class="fa fa-plus"></i> Add a Cleaner</a>
+            </div>
+        </div>
+
+        <div class="pad1"></div>
+        <br><br>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Existing Cleaners</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="div-user-selectedcleaners">
+            @{
+                var postModel = new ClassLibrary.WebModels.MyCleanersViewModel();
+                postModel.userId = Convert.ToInt64(Model.userId);
+                postModel.index = Convert.ToInt32(Model.index);
+                @Html.Partial("~/Views/User/_pv_list_selectedcleaners.cshtml", postModel)
+            }
+        </div><!-- /row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-user-selectedcleaners-pagination">
+                    @{
+                        var paginationModel = new ClassLibrary.WebModels.MyCleanersViewModelUserMyPropertiesPaginationModel();
+                        paginationModel.currenttIndex = Model.index;
+                        paginationModel.nextIndex = Model.index + 1;
+                        paginationModel.userId = Convert.ToInt64(Model.userId);
+                    }
+                    @Html.Partial("~/Views/User/_pv_list_selectedcleaners_pagination.cshtml", paginationModel)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+@*<!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add Cleaner</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="add-cleaner-popup">
+                        <div class="cleaners-popup">
+                            <img class="img-responsive" id="img-pic" src="/Content/images/icons/profile-icon.png">
+                            <div class="cleanerName">
+                                <h4 id="h4-cleanername">Name</h4>
+                                <h5><i class="fa fa-phone"></i>&nbsp;<label id="lbl-phone"> Phone</label> </h5>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="slt-NotSelectedleaner">
+                                <option value="0" data-cleanerid=" 0">Please select</option>
+                                @{
+                                    var cleanerList = new EntitiesLibrary.Data.WebService().getNotSelectedleanerList(Model.userId).ToList();
+                                    if (cleanerList.Count > 0)
+                                    {
+                                        foreach (var item in cleanerList)
+                                        {
+                                            <option value="@item.CLEANERID" data-cleanerid="@item.CLEANERID" data-phone="@item.PHONE" data-pic="@item.PROFILEIMAGE">@item.FIRSTNAME @item.LASTNAME</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group" style="text-align: center;">
+                            <button type="button" class="btn btn-default" disabled id="btn-dummy-add-mycleaner" style="width: 50%;">Submit</button>
+                            <button type="submit" class="btn btn-default" id="btn-submit-add-mycleaner" style="width: 50%;display:none;">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>*@
+
+
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="close-mycleaner-modal">&times;</button>
+                <h4 class="modal-title">Add Cleaner</h4>
+            </div>
+            <div class="modal-body">
+                <div class="add-cleaner-popup">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="my-cleaner-search" placeholder="Search">
+                    </div>
+                    <ul class="cleaner-list ul-cleanerlist">
+                        @{
+                            var cleanerList = new EntitiesLibrary.Data.WebService().getNotSelectedleanerList(Model.userId).ToList();
+                            if (cleanerList.Count > 0)
+                            {
+                                foreach (var item in cleanerList)
+                                {
+                                    <li class="li-my-cleaners" data-firstname="@item.FIRSTNAME" data-lastname="@item.LASTNAME" data-cleanerid="@item.CLEANERID">
+                                        <div class="cleaners-popup">
+                                            <div class="selct-bx">
+                                                <div class="form-group">
+                                                    <input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="@item.CLEANERID">
+                                                    <span class="checkbox-css" id="foo"></span>
+                                                </div>
+                                            </div>
+                                            <img class="img-responsive" src="@item.PROFILEIMAGE">
+                                            <div class="cleanerName">
+                                                <h4>@item.FIRSTNAME @item.LASTNAME</h4>
+                                                <h5><i class="fa fa-phone"></i> @item.PHONE</h5>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                    <a class="btn edit center-block" id="btn-submit-mycleaners">Add</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- checkbox tick js -->
+<script>
+    $(document).on('click', '.checkbox-css', function () {
+        $(this).toggleClass('active fa fa-check');
+
+        if ($(this).siblings('.hidden-checkbox').prop('checked')) {
+            $(this).siblings('.hidden-checkbox').prop('checked', false);
+        }
+        else { $(this).siblings('.hidden-checkbox').prop('checked', true); }
+    });
+
+
+    $(document).on('click', '#close-mycleaner-modal', function () {
+        $('#myModal').modal('hide');
+        $('#my-cleaner-search').val('');
+        var obj1 = new Object();
+        var userId = $('#userId').val();
+        obj1.userId = userId;
+      
+        $.ajax({
+            url: '/User/refreshMyCleanersDropdown',
+            type: "POST",
+            data: obj1,
+            dataType: 'json',
+            global: false,
+            success: function (data) {
+                if (data.Status) {
+                    var html = "";
+                    $(data.List).each(function () {
+                        //html = html + '<li class="li-my-cleaners" data-firstname="' + data.List.FIRSTNAME + '" data-lastname="' + data.List.LASTNAME + '" data-cleanerid="' + data.List.CLEANERID + '"><div class="cleaners-popup"><div class="selct-bx"><div class="form-group"><input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="' + data.List.CLEANERID + '"><span class="checkbox-css" id="foo"></span></div></div><img class="img-responsive" src="' + data.List.PROFILEIMAGE + '"><div class="cleanerName"><h4>' + data.List.FIRSTNAME + " " + data.List.LASTNAME + '</h4><h5><i class="fa fa-phone"></i> ' + data.List.PHONE + '</h5></div></div></li>';
+                        html = html + '<li class="li-my-cleaners" data-firstname="' + this.FIRSTNAME + '" data-lastname="' + this.LASTNAME + '" data-cleanerid="' + this.CLEANERID + '"><div class="cleaners-popup"><div class="selct-bx"><div class="form-group"><input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="' + this.CLEANERID + '"><span class="checkbox-css" id="foo"></span></div></div><img class="img-responsive" src="' + this.PROFILEIMAGE + '"><div class="cleanerName"><h4>' + this.FIRSTNAME + " " + this.LASTNAME + '</h4><h5><i class="fa fa-phone"></i> ' + this.PHONE + '</h5></div></div></li>';
+                    });
+                    setTimeout(function () {
+                        $('.ul-cleanerlist').html(html);
+                    }, 200);
+                }
+            }
+        });
+    });
+
+</script>
+
+
+
+<script>
+
+    $(document).on('keyup', '#my-cleaner-search', function () {
+        var keyword = $(this).val();
+        $('.li-my-cleaners').each(function () {
+            if (keyword == null || keyword == "") {
+                $(this).css('display', 'block');
+            }
+            else {
+                var firstName = $(this).attr('data-firstname');
+                var lastName = $(this).attr('data-lastname');
+                if (firstName.toLowerCase().indexOf(keyword.toLowerCase()) == -1) {
+                    if (lastName.toLowerCase().indexOf(keyword.toLowerCase()) == -1) {
+                        //console.log($(this).children().find('.chk-mycleaner:checkbox:checked'));
+                        if ($(this).children().find('.chk-mycleaner').prop("checked") == false)
+                            $(this).css('display', 'none');
+                    }
+                }
+                else {
+                    $(this).css('display', 'block');
+                }
+            }
+        });
+    });
+
+
+
+    $(document).on('click', '#btn-submit-mycleaners', function () {
+        var status = false;
+        var obj = new Object();
+        obj.cleanerIds = "";
+        $('.chk-mycleaner:checkbox:checked').each(function () {
+            //var obj2 = new Object();
+            //obj2.cleanerId = $(this).attr('data-cleanerid');
+            //alert($(this).attr('data-cleanerid'));
+            //obj.cleanerIds.push($(this).attr('data-cleanerid'));
+            //obj.cleanerIds.push($(this).attr('data-cleanerid'));
+            if (obj.cleanerIds == "")
+                obj.cleanerIds = obj.cleanerIds + $(this).attr('data-cleanerid');
+            else {
+                obj.cleanerIds = obj.cleanerIds + "," + $(this).attr('data-cleanerid');
+            }
+            status = true;
+        });
+        setTimeout(function () {
+            if (status) {
+                var userId = $('#userId').val();
+                //var newobj = new Object();
+                //newobj.userId = userId;
+                //newobj.cleanerIds = [];
+                //newobj.cleanerIds = obj.cleanerIds
+                ////newobj.cleanerIds = list;
+                //console.log(newobj);
+                obj.userId = userId;
+                //console.log(obj);
+                $.ajax({
+                    url: '/User/postUserSelectedCleaner',
+                    type: "POST",
+                    data: obj,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.Status) {
+                            toastr.success(data.Message);
+                            setTimeout(function () {
+                                RefreshSelectedCleanersList();
+                                RefreshSelectedCleanersListPagination();
+                                $('#myModal').modal('hide');
+                                //ReInitializePopup();
+                                $('#my-cleaner-search').val('');
+                                var obj1 = new Object();
+                                obj1.userId = userId;
+
+                                $.ajax({
+                                    url: '/User/refreshMyCleanersDropdown',
+                                    type: "POST",
+                                    data: obj1,
+                                    dataType: 'json',
+                                    global: false,
+                                    success: function (data) {
+                                        if (data.Status) {
+                                            var html = "";
+                                            $(data.List).each(function () {
+                                                //html = html + '<li class="li-my-cleaners" data-firstname="' + data.List.FIRSTNAME + '" data-lastname="' + data.List.LASTNAME + '" data-cleanerid="' + data.List.CLEANERID + '"><div class="cleaners-popup"><div class="selct-bx"><div class="form-group"><input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="' + data.List.CLEANERID + '"><span class="checkbox-css" id="foo"></span></div></div><img class="img-responsive" src="' + data.List.PROFILEIMAGE + '"><div class="cleanerName"><h4>' + data.List.FIRSTNAME + " " + data.List.LASTNAME + '</h4><h5><i class="fa fa-phone"></i> ' + data.List.PHONE + '</h5></div></div></li>';
+                                                html = html + '<li class="li-my-cleaners" data-firstname="' + this.FIRSTNAME + '" data-lastname="' + this.LASTNAME + '" data-cleanerid="' + this.CLEANERID + '"><div class="cleaners-popup"><div class="selct-bx"><div class="form-group"><input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="' + this.CLEANERID + '"><span class="checkbox-css" id="foo"></span></div></div><img class="img-responsive" src="' + this.PROFILEIMAGE + '"><div class="cleanerName"><h4>' + this.FIRSTNAME + " " + this.LASTNAME + '</h4><h5><i class="fa fa-phone"></i> ' + this.PHONE + '</h5></div></div></li>';
+                                            });
+                                            setTimeout(function () {
+                                                $('.ul-cleanerlist').html(html);
+                                            }, 200);
+                                        }
+                                    }
+                                });
+
+
+                            }, 200);
+                        }
+                        else {
+                            toastr.error(data.Message);
+                        }
+                    }
+                });
+            }
+        }, 250);
+
+    });
+
+
+
+</script>
+
+
+
+<script>
+
+    $('#slt-NotSelectedleaner').on('change', function () {
+        var source = $(this);
+        var cleanerId = $("#slt-NotSelectedleaner option:selected").attr('data-cleanerid');
+        var phone = $("#slt-NotSelectedleaner option:selected").attr('data-phone');
+        var pic = $("#slt-NotSelectedleaner option:selected").attr('data-pic');
+        var cleanerName = $("#slt-NotSelectedleaner option:selected").val();
+        if (cleanerId == 0) {
+            $('#lbl-phone').text(' Phone');
+            $('#h4-cleanername').text('Name');
+            $('#img-pic').attr("src", "/Content/images/icons/profile-icon.png");
+            $('#btn-dummy-add-mycleaner').prop('disabled', true);
+        }
+        else {
+            $('#lbl-phone').text(' ' + phone);
+            $('#h4-cleanername').text(cleanerName);
+            $('#img-pic').attr("src", pic);
+            $('#btn-dummy-add-mycleaner').prop('disabled', false);
+        }
+    });
+
+
+    function ReInitializePopup() {
+        $('#lbl-phone').text(' Phone');
+        $('#h4-cleanername').text('Name');
+        $('#img-pic').attr("src", "/Content/images/icons/profile-icon.png");
+        $('#btn-dummy-add-mycleaner').prop('disabled', true);
+        $("#slt-NotSelectedleaner option[value=0]").attr('selected', 'selected');
+    }
+
+    $(document).on('click', '#btn-dummy-add-mycleaner', function () {
+        var cleanerId = $("#slt-NotSelectedleaner option:selected").attr('data-cleanerid');
+        var phone = $("#slt-NotSelectedleaner option:selected").attr('data-phone');
+        var pic = $("#slt-NotSelectedleaner option:selected").attr('data-pic');
+        var cleanerName = $("#slt-NotSelectedleaner option:selected").val();
+        if (cleanerId != 0) {
+            var userId = $('#userId').val();
+            var newobj = new Object();
+            newobj.userId = userId;
+            newobj.cleanerId = cleanerId;
+
+            $.ajax({
+                url: '/User/postUserSelectedCleaner',
+                type: "POST",
+                data: newobj,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            RefreshSelectedCleanersList();
+                            RefreshSelectedCleanersListPagination();
+                            $('#myModal').modal('hide');
+                            ReInitializePopup();
+
+                            var obj1 = new Object();
+                            obj1.userId = userId;
+
+                            $.ajax({
+                                url: '/User/refreshMyCleanersDropdown',
+                                type: "POST",
+                                data: obj1,
+                                dataType: 'json',
+                                global: false,
+                                success: function (data) {
+                                    if (data.Status) {
+                                        $('#slt-NotSelectedleaner').children().remove();
+                                        $("#slt-NotSelectedleaner").append(" <option value=" + 0 + " data-cleanerid=" + 0 + ">Please select</option>");
+                                        $(data.List).each(function () {
+                                            $("#slt-NotSelectedleaner").append("<option value=" + this.CLEANERID + " data-cleanerid=" + this.CLEANERID + " data-phone=" + this.PHONE + " data-pic= " + this.PROFILEIMAGE + " >" + this.FIRSTNAME + " " + this.LASTNAME + "</option>");
+                                        });
+                                    }
+                                }
+                            });
+
+
+                        }, 200);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+        }
+    });
+
+
+</script>
+
+
+
+
+<script>
+
+
+    $(document).on('click', '.user-delete-selectedcleaner', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var userId = $(source).attr('data-userId');
+            var cleanerId = $(source).attr('data-cleanerid');
+            var index = $('#index').val();
+            var obj = new Object();
+            obj.cleanerId = cleanerId;
+            obj.userId = userId;
+            obj.index = index;
+            $.ajax({
+                url: '/User/RemoveSelectedCleaners',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            var elementCount = $('.user-delete-selectedcleaner').length;
+                            if (parseInt(index) != 0) {
+                                if (parseInt(elementCount) == 1) {
+                                    $('#index').val(parseInt(parseInt(index) - 1));
+                                }
+                                RefreshSelectedCleanersList();
+                                RefreshSelectedCleanersListPagination();
+
+                                var obj1 = new Object();
+                                obj1.userId = userId;
+
+                                $.ajax({
+                                    url: '/User/refreshMyCleanersDropdown',
+                                    type: "POST",
+                                    data: obj1,
+                                    dataType: 'json',
+                                    global: false,
+                                    success: function (data) {
+                                        if (data.Status) {
+                                            //$('#slt-NotSelectedleaner').children().remove();
+                                            //$("#slt-NotSelectedleaner").append(" <option value=" + 0 + " data-cleanerid=" + 0 + ">Please select</option>");
+                                            //$(data.List).each(function () {
+                                            //    $("#slt-NotSelectedleaner").append("<option value=" + this.CLEANERID + " data-cleanerid=" + this.CLEANERID + " data-phone=" + this.PHONE + " data-pic= " + this.PROFILEIMAGE + " >" + this.FIRSTNAME + " " + this.LASTNAME + "</option>");
+                                            //});
+                                            var html = "";
+                                            $(data.List).each(function () {
+                                                //console.log(this.FIRSTNAME);
+                                                html = html + '<li class="li-my-cleaners" data-firstname="' + this.FIRSTNAME + '" data-lastname="' + this.LASTNAME + '" data-cleanerid="' + this.CLEANERID + '"><div class="cleaners-popup"><div class="selct-bx"><div class="form-group"><input type="checkbox" class="hidden-checkbox chk-mycleaner" data-cleanerid="' + this.CLEANERID + '"><span class="checkbox-css" id="foo"></span></div></div><img class="img-responsive" src="' + this.PROFILEIMAGE + '"><div class="cleanerName"><h4>' + this.FIRSTNAME + " " + this.LASTNAME + '</h4><h5><i class="fa fa-phone"></i> ' + this.PHONE + '</h5></div></div></li>';
+                                            });
+                                            setTimeout(function () {
+                                                $('.ul-cleanerlist').html(html);
+                                            }, 200);
+                                        }
+                                    }
+                                });
+
+                            }
+                            else {
+                                location.reload();
+                            }
+                        }, 200);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+    function RefreshSelectedCleanersListPagination() {
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var newobj = new Object();
+        newobj.currenttIndex = parseInt(index);
+        newobj.nextIndex = parseInt(index) + parseInt(1);
+        newobj.userId = userId;
+        $.ajax({
+            url: '/User/RefreshSelectedCleanersListPagination',
+            type: "POST",
+            data: newobj,
+            dataType: 'html',
+            success: function (result) {
+                $('#div-user-selectedcleaners-pagination').html(result);
+            }
+        });
+    }
+
+
+    function RefreshSelectedCleanersList() {
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var obj = new Object();
+        obj.index = index;
+        obj.userId = userId;
+
+        $.ajax({
+            url: '/User/RefreshSelectedCleanersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-selectedcleaners').html(data);
+            }
+        });
+    }
+
+
+    $(document).on('click', '.a-user-selectedcleaner-pageChange-prev', function () {
+
+        var index = $('#index').val();
+        var obj = new Object();
+        var userId = $('#userId').val();
+        obj.index = parseInt(index) - parseInt(1);
+        obj.userId = userId;
+        $.ajax({
+            url: '/User/RefreshSelectedCleanersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-selectedcleaners').html(data);
+
+                $('#index').val(parseInt(index) - parseInt(1));
+                var newobj = new Object();
+                newobj.currenttIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.userId = userId;
+                $.ajax({
+                    url: '/User/RefreshSelectedCleanersListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-selectedcleaners-pagination').html(result);
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.a-user-selectedcleaner-pageChange-next', function () {
+
+        var index = $('#index').val();
+        var userId = $('#userId').val();
+        var obj = new Object();
+        obj.index = parseInt(index) + parseInt(1);
+        obj.userId = userId;
+        $.ajax({
+            url: '/User/RefreshSelectedCleanersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-selectedcleaners').html(data);
+                $('#index').val(parseInt(index) + parseInt(1));
+                var newobj = new Object();
+                newobj.currenttIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.userId = userId;
+                $.ajax({
+                    url: '/User/RefreshSelectedCleanersListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-selectedcleaners-pagination').html(result);
+                    }
+                });
+            }
+        });
+
+    });
+
+
+
+</script>

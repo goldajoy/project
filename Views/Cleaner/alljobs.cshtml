@@ -1,0 +1,267 @@
+﻿@model ClassLibrary.WebModels.ViewAllJobs
+@{
+    ViewBag.Title = "alljobs";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+    var companyList = new EntitiesLibrary.Data.WebService().GetCompanyList();
+}
+
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle center-block text-center">
+                    All Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="form-pad"></div>
+        @using (Html.BeginForm("alljobsdetails", "Cleaner", FormMethod.Post))
+        {
+            @Html.HiddenFor(m => m.startDate)
+            @Html.HiddenFor(m => m.companyId, new { Value = 0 })
+            @Html.HiddenFor(m => m.index, new { Value = 0 })
+            @Html.HiddenFor(m => m.endDate)
+            @Html.HiddenFor(m => m.All, new { Value = "false" })
+            @Html.HiddenFor(m => m.isCompany, new { Value = "false" })
+            @Html.HiddenFor(m => m.TimeZone, new { Value = "Etc/UTC" })
+            @Html.HiddenFor(m => m.propertyId, new { Value = 0 })
+            @Html.HiddenFor(m => m.workType, new { Value = ClassLibrary.Enum.WorkType.All })
+
+
+            <div id="" class="row">
+                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+
+                </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+
+                </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+            </div><!-- /row -->
+
+
+
+            <div class="row">
+                <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-12">
+
+                    <div class="form-group">
+                        <select class="form-control" id="slct-user-company">
+                            <option value="0">Select company</option>
+                            @if (companyList.Count > 0)
+                            {
+                                foreach (var company in companyList)
+                                {
+                                    <option value="@company.UserId">@(company.CompanyName ?? string.Empty)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" id="slct-user-property" disabled>
+                            <option value="0">Select my Property</option>
+                            @*@if (Model.UserProperties.Count > 0)
+                                {
+                                    foreach (var property in Model.UserProperties)
+                                    {
+                                        <option value="@property.propertyId">@(property.propertyName ?? string.Empty)</option>
+                                    }
+                                }*@
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="padding-top:10px;">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <input type="radio" id="cleaning" class="radio-cleaning" name="cl">
+                                    <label for="cleaning">Cleaning</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <input type="radio" id="meet" class="radio-meet" name="cl">
+                                    <label for="meet">Meet/Greet</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @*<select class="form-control">
+                                <option>Select Cleaner</option>
+                            </select>*@
+                        @Html.DropDownListFor(m => m.cleanerId, new EntitiesLibrary.Data.DropdownData().GetCleaner(), "Select Cleaner", new { @class = "form-control slct-cleaner-list" })
+                        <span id="spn-cleanerId-error" style="color:red;"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <input type="text" class="form-control startDate" placeholder="Start Date" id="date" name="date" />
+                                    <span id="spn-startDate-error" style="color:red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <input type="text" class="form-control endDate" placeholder="End Date" id="date" name="date" />
+                                    <span id="spn-endDate-error" style="color:red;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-pad1"></div>
+                        <input type="submit" value="View Jobs" id="btn-submit-alljobs" class="btn btn-default view-job-btn view-btn" style="width:100%;display:none;">
+                        <input type="button" value="View Jobs" id="btn-dummy-submit-alljobs" class="btn btn-default view-job-btn view-btn" style="width:100%;">
+                        @*<a href="/Cleaner/alljobsdetails">View Jobs</a>*@
+                    </div>
+                </div><!-- /col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-12 -->
+            </div>
+        }
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+<!-- Include Date Range Picker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var date_input = $('input[name="date"]'); //our date input has the name "date"
+        var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+        //var d = new Date();
+
+        //var month = d.getMonth() + 1;
+        //var day = d.getDate();
+
+        //var output =
+        //    (('' + day).length < 2 ? '0' : '') + day + '/' + (('' + month).length < 2 ? '0' : '') + month + '/' + d.getFullYear();
+
+        date_input.datepicker({
+            format: 'dd/mm/yyyy',
+            container: container,
+            todayHighlight: true,
+            autoclose: true
+            //startDate: output
+        })
+
+        function getTimezoneName() {
+            timezone = jstz.determine()
+            $('#TimeZone').val(timezone.name());
+            return timezone.name();
+        }
+        var timezone = getTimezoneName();
+    });
+</script>
+
+<script>
+
+    $(document).on('change', '#slct-user-company', function () {
+        var value = $(this).find(":selected").val();
+        if (value == "0") {
+            $('#companyId').val(parseInt(value));
+            $('#isCompany').val("false");
+            $('#slct-user-property').val(0);
+            //$('#slct-user-property').text("Select my Property");
+            $('#slct-user-property').prop('disabled', true);
+            $('#slct-cleaner-list').prop('disabled', false);
+            $('#All').val("false");
+        }
+        else {
+            $.ajax({
+                url: '/Cleaner/getPropertyList?userId=' + parseInt(value),
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status == true) {
+                        $.each(data.list, function (key, value) {
+
+                            $("#slct-user-property").append($("<option></option>").val(value.propertyId).html(value.propertyName));
+
+                        });
+
+                    }
+                },
+                error: function (data) {
+
+                    alert("Error");
+
+                }
+            });
+            $('#All').val("true");
+            $('#companyId').val(parseInt(value));
+            $('#isCompany').val("true");
+            $('#slct-user-property').prop('disabled', false);
+            $('.slct-cleaner-list').prop('disabled', true);
+        }
+    });
+
+
+    $(document).on('change', '#slct-user-property', function () {
+        var propertyId = $(this).find(":selected").val();
+        $('#propertyId').val(parseInt(propertyId));
+    });
+
+
+    $(document).on('click', '.radio-cleaning', function () {
+        $('#workType').val("Cleaning");
+    });
+    $(document).on('click', '.radio-meet', function () {
+        $('#workType').val("MeetORgreet");
+    });
+
+</script>
+
+
+<script>
+
+    $(document).on('click', '#btn-dummy-submit-alljobs', function () {
+
+        var status = true;
+        var dropDownValue = $("#cleanerId option:selected").val();
+        var dropDownValueCompany = $("#slct-user-company option:selected").val();
+        var startDate = $(".startDate").val();
+        var endDate = $(".endDate").val();
+        if (dropDownValueCompany == 0) {
+            if (dropDownValue != null && dropDownValue != "") {
+                $('#spn-cleanerId-error').hide();
+            }
+            else {
+                status = false;
+                $('#spn-cleanerId-error').text("Required").show();
+            }
+        }
+
+        if (startDate != null && startDate != "") {
+            $('#startDate').val(startDate);
+            $('#spn-startDate-error').hide();
+        }
+        else {
+            status = false;
+            $('#spn-startDate-error').text("Required").show();
+        }
+
+        if (endDate != null && endDate != "") {
+            $('#endDate').val(endDate);
+            $('#spn-endDate-error').hide();
+        }
+        else {
+            status = false;
+            $('#spn-endDate-error').text("Required").show();
+        }
+
+        setTimeout(function () {
+            if (status) {
+                $('.preloder').show();
+                $('#btn-dummy-submit-alljobs').prop('disabled', true);
+                $('#btn-submit-alljobs').trigger('click');
+            }
+        }, 150);
+
+    });
+
+</script>

@@ -1,0 +1,176 @@
+﻿@model ClassLibrary.WebModels.UserViewProperty
+@{
+    ViewBag.Title = "viewproperty";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var property = new EntitiesLibrary.Data.UserProperty(Model.propertyId);
+}
+
+<section class="inner-pages">
+    <div class="container" style="pointer-events:none;">
+        <div class="row">
+            @*<div class="col-md-12">
+                    <div class="innr-pg-ttle">
+                        Property
+                    </div><!-- /innr-pg-ttle -->
+                </div><!-- /col-md-12 -->*@
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="personal-details">
+                    <img src="~/Content/images/icons/add-property.png" />
+                    <span>Property</span>
+                </div><!-- /personal-details -->
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="radio" id="test1" name="sp" @((property == null ? "" : property.JobType == ClassLibrary.Enum.JobType.Business.ToString() ? "checked" : "")) />
+                            <label for="test1">Business</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="radio" id="test2" name="sp" @((property == null ? "" : property.JobType == ClassLibrary.Enum.JobType.Residential.ToString() ? "checked" : "")) />
+                            <label for="test2">Residential</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Property Name" value="@((property == null ? "" : property.PropertyName == null ? "" : property.PropertyName))" />
+                </div>
+
+                <h4 class="form-title">Details</h4>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="First Name" value="@((property == null ? "" : property.FirstName == null ? "" : property.FirstName))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Last Name" value="@((property == null ? "" : property.LastName == null ? "" : property.LastName))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Phone Number" value="@((property == null ? "" : property.Phone == null ? "" : property.Phone))" />
+                </div>
+
+            </div><!-- /col-md-4 -->
+
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Address Details</span>
+                </div><!-- /personal-details -->
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Address" value="@((property == null ? "" : property.Address == null ? "" : property.Address))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Suburb" value="@((property == null ? "" : property.Suburb == null ? "" : property.Suburb))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="State" value="@((property == null ? "" : property.State == null ? "" : property.State))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" value="Australia" /><!-- Dynamic -->
+                </div>
+
+                <div class="form-pad"></div>
+
+                <div class="personal-details-no-icon">
+                    <span>Photos</span>
+                </div><!-- /personal-details -->
+
+                <ul class="upload-imgs">
+                    @{
+                        if (property != null)
+                        {
+                            int count = 0;
+                            if (property.PropertyImages.Count > 0)
+                            {
+                                foreach (var item in property.PropertyImages)
+                                {
+                                    <li>
+                                        <input type="image" style="max-width: 76px;" src="@item.ToString()" />
+                                    </li>
+                                    count++;
+                                }
+
+                                for (int i = 0; i < 4 - count; i++)
+                                {
+                                    <li>
+                                        <input type="image" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    <li>
+                                        <input type="image" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                    </li>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                <li>
+                                    <input type="image" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </div><!-- /col-md-4 -->
+
+            <div class="col-md-4">
+                <div class="personal-details-no-icon">
+                    <span>Type</span>
+                </div><!-- /personal-details -->
+
+                <div class="form-group">
+                    <select class="form-control">
+                        <option @((property == null ? "" : property.PropertyType == ClassLibrary.Enum.PropertyType.Airbnb.ToString() ? "selected" : ""))>Airbnb</option>
+                        <option @((property == null ? "" : property.PropertyType == ClassLibrary.Enum.PropertyType.Domestic.ToString() ? "selected" : ""))>Domestic</option>
+                        <option @((property == null ? "" : property.PropertyType == ClassLibrary.Enum.PropertyType.Commercial.ToString() ? "selected" : ""))>Commercial</option>
+                    </select>
+                </div>
+
+                <div class="form-pad"></div>
+
+                <div class="personal-details-no-icon">
+                    <span>Property Details</span>
+                </div><!-- /personal-details -->
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Bedrooms" value="@((property == null ? "" : property.BedroomNumString == null ? "" : property.BedroomNumString))" />
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Bathrooms" value="@((property == null ? "" : property.BathroomNumString == null ? "" : property.BathroomNumString))" />
+                </div>
+
+                <div class="form-group">
+                    <textarea rows="3" class="form-control" placeholder="Description">@((property == null ? "" : property.Description == null ? "" : property.Description))</textarea>
+                </div>
+            </div><!-- /col-md-4 -->
+
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>

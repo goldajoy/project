@@ -1,0 +1,51 @@
+﻿@model ClassLibrary.WebModels.ManageUsersModel
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+
+@if (Model.userRole == ClassLibrary.Enum.UserRole.User)
+{
+    var userList = new EntitiesLibrary.Data.WebService().getUserslist(Model);
+    if (userList.Count > 0)
+    {
+        foreach (var item in userList)
+        {
+            <div class="col-md-6" id="">
+                <div class="cleaners">
+                    <img class="img-responsive" id="img-pic" src="@item.PROFILEIMAGE">
+                    <div class="cleanerName">
+                        <h4 id="h4-cleanername">@item.FIRSTNAME @item.LASTNAME</h4>
+                        <h5><i class="fa fa-phone"></i>&nbsp;<label id="lbl-phone"> @item.PHONE</label> </h5>
+                    </div>
+                    <div style="float: right;">
+                        <button class="btn" style="background-color: green;">Edit</button>
+                        <button class="btn btn-danger admin-delete-User" data-userid="@item.USERID">Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+else
+{
+    var userList = new EntitiesLibrary.Data.WebService().getCleanerlist(Model);
+    if (userList.Count > 0)
+    {
+        foreach (var item in userList)
+        {
+            <div class="col-md-6" id="">
+                <div class="cleaners">
+                    <img class="img-responsive" id="img-pic" src="@item.PROFILEIMAGE">
+                    <div class="cleanerName">
+                        <h4 id="h4-cleanername">@item.FIRSTNAME @item.LASTNAME</h4>
+                        <h5><i class="fa fa-phone"></i>&nbsp;<label id="lbl-phone"> @item.PHONE</label> </h5>
+                    </div>
+                    <div style="float: right;">
+                        <button class="btn" style="background-color: green;">Edit</button>
+                        <button class="btn btn-danger admin-delete-User" data-userid="@item.CLEANERID">Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}

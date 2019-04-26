@@ -1,0 +1,544 @@
+﻿@model ClassLibrary.WebModels.ViewJobDetailsModel
+@{
+    ViewBag.Title = "viewjobdetails";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Model.jobId);
+}
+
+@if (job != null)
+{
+    <section class="inner-pages">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    @if (job != null)
+                    {
+                        if (job.PostedUserDetail != null)
+                        {
+                            <div class="innr-pg-ttle">
+                                @(job.PostedUserDetail.FirstName + " " + job.PostedUserDetail.LastName)
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                        else
+                        {
+                            <div class="innr-pg-ttle">
+                                &nbsp;
+                            </div><!-- /innr-pg-ttle -->
+                        }
+                    }
+                    else
+                    {
+                        <div class="innr-pg-ttle">
+                            &nbsp;
+                        </div><!-- /innr-pg-ttle -->
+                    }
+                </div><!-- /col-md-12 -->
+            </div><!-- /row -->
+
+            <div class="form-pad"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row pad1">
+                        <div class="col-md-12">
+                            <div class="personal-details">
+                                <img src="~/Content/images/icons/personal-details.png" />
+                                <span>Personal Details</span>
+                            </div><!-- /personal-details -->
+                        </div><!-- /col-md-12 -->
+                    </div><!-- /row -->
+
+                    <div class="job">
+                        <div class="job-header">
+                            <span class="col-md-4">&nbsp;</span>
+                            @if (Data != null)
+                            {
+                                if (Data.IsAdmin)
+                                {
+
+                                    <span class="pull-right text-right col-md-4">$@(job.PriceString == "" ? "0" : job.PriceString)</span>
+                                }
+                                else
+                                {
+                                    <span class="pull-right text-right col-md-4">$@(job.AdminPriceString == "" ? "0" : job.AdminPriceString)</span>
+
+                                }
+                            }
+                        </div><!-- /job-header -->
+                        <div class="job-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <!--<i class="fa fa-map-marker"></i>-->
+                                    <img src="~/Content/images/icons/location.png" class="location-img" />
+                                    @*<span>1851 Princes Highway, Heywoord Victoria, Australia</span>*@
+                                    <span>
+                                        @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                        @((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)) @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                        @((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                    </span>
+                                </div>
+                                <div class="col-md-4">
+                                    <img src="~/Content/images/icons/calendar-icon.png" />
+                                    <span>@*06-10-2017*@</span>
+                                    @try
+                                    {
+                                        <span>@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        <span>@job.Date1.ToString("dd-MM-yyyy")</span>
+                                    }
+                                    <br>
+                                    <img src="~/Content/images/icons/clock-icon.png" />
+                                    @* <span>11:59 AM</span>*@
+                                    @try
+                                    {
+                                        <span>@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        <span>@job.Date1.ToString("hh:mm tt")</span>
+                                    }
+                                </div>
+                            </div><!-- /row -->
+                        </div><!-- /job-body-->
+                    </div><!-- /job -->
+                </div><!-- /col-md-6 -->
+
+
+                <div class="col-md-6">
+                    <div class="row pad1">
+                        <div class="col-md-6">
+                            <div class="personal-details">
+                                <img src="~/Content/images/icons/property-details.png" />
+                                <span>Property Details</span>
+                            </div><!-- /personal-details -->
+                        </div><!-- /col-md-6 -->
+
+                        <div class="col-md-5 col-md-offset-1">
+                        </div><!-- /col-md-5 -->
+                    </div><!-- /row -->
+
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-md-12">
+                                <ul class="prpty-images">
+                                    @if (job != null)
+                                    {
+                                        if (job.PropertyDetail != null)
+                                        {
+                                            int count = 0;
+                                            if (job.PropertyDetail.PropertyImagesFile.Count > 0)
+                                            {
+                                                foreach (var image in job.PropertyDetail.PropertyImagesFile)
+                                                {
+                                                    <li><img class="img-responsive" src="@image.Filepath" style="width:110px;" /></li>
+                                                    count++;
+                                                }
+                                                for (int i = 0; i < 4 - count; i++)
+                                                {
+                                                    <li><img class="img-responsive" src="~/Content/images/add-images.png" style="width:110px;" /></li>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for (int i = 0; i < 4 - count; i++)
+                                                {
+                                                    <li><img class="img-responsive" src="~/Content/images/add-images.png" style="width:110px;" /></li>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            for (int i = 0; i < 4; i++)
+                                            {
+                                                <li><img class="img-responsive" src="~/Content/images/add-images.png" style="width:110px;" /></li>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int i = 0; i < 4; i++)
+                                        {
+                                            <li><img class="img-responsive" src="~/Content/images/add-images.png" style="width:110px;" /></li>
+                                        }
+                                    }
+
+                                    @*<li><img class="img-responsive" src="../images/property/1.jpg" /></li>
+                                        <li><img class="img-responsive" src="../images/property/1.jpg" /></li>
+                                        <li><img class="img-responsive" src="../images/property/1.jpg" /></li>*@
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="job jd-detail">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><label>Property Type :</label> <span>@(job.PropertyDetail != null ? job.PropertyDetail.PropertyType : string.Empty)</span></h5>
+                                <h5><label>Work Type :</label> <span>@(job.WorkType ?? string.Empty)</span></h5>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Property Description</h5>
+                                <h5>
+                                    <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BedroomNumString : string.Empty) Bedrooms</span>
+                                    <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BathroomNumString : string.Empty) Bathrooms</span>
+                                </h5>
+                            </div>
+                            <div class="col-md-12"><h5><span> @(job.PropertyDetail != null ? job.PropertyDetail.Description : string.Empty)</span></h5></div>
+                            <div class="col-md-12"><h5>Instructions : <span>@(job.Instructions ?? string.Empty)</span></h5></div>
+                        </div>
+                    </div><!-- /job -->
+                </div><!-- /col-md-6 -->
+            </div><!-- /row -->
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="dtl-checkbox-list">
+                        <button class="btn btn-default finalize-btn cleaner-accept-job" data-cleanerid="@(Data!=null?Data.Id:0)" data-jobid="@Model.jobId">Accept</button>
+                        @if (Data != null)
+                        {
+                            if (Data.IsAdmin)
+                            {
+                                <button class="btn btn-default back-btn" data-toggle="modal" data-target="#myModal">Make it live</button>
+                            }
+                        }
+                    </div><!-- /dtl-checkbox-list -->
+                </div><!-- /col-md-6 -->
+            </div><!-- /row -->
+
+            <div class="pad1"></div>
+
+            @if (Data != null)
+            {
+                if (Data.IsAdmin)
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="personal-details">
+                                    <img src="~/Content/images/icons/counter-offer.png" />
+                                    <span>Counter Offer</span>
+                                </div><!-- /personal-details -->
+                            </div><!-- /col-md-12 -->
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="counter-offer">
+                                    <h5>Counter offer</h5>
+                                    <div class="form-group dollar-inp-box">
+                                        <span>$</span>
+                                        <input type="text" class="form-control" id="admin-counteroffer-price" />
+                                        <span id="spn-admin-counteroffer-price" style="display: none; color: red; font-size: 14px; margin-left: 37px;">Required</span>
+                                    </div>
+                                    <!--<div class="counter-offer-btns">
+                                        <a href="#" class="btn delete">Submit Counter Offer</a>
+                                        <a href="#" class="btn view">Back to jobs</a>
+                                    </div>-->
+
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="counter-offer-btns">
+                                                <a class="btn delete" style="width:100%" id="admin-submit-counteroffer" data-price="@(job!=null?job.PriceString:"")" data-cleanerid="@(Data!=null?Data.Id:0)" data-jobid="@Model.jobId">Submit Counter Offer</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="counter-offer-btns">
+                                                <a href="/Cleaner/viewjobs" class="btn view" style="width:100%">Back to jobs</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /row -->
+                }
+            }
+
+        </div><!-- /container -->
+    </section><!-- /main-banner -->
+}
+
+
+<br><br><br>
+
+<style>
+    .ms-options {
+        max-width: 478px;
+        margin-left: 60px;
+        max-height: 273px !important;
+    }
+</style>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none;">
+                <button type="button" class="close popup-close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body detail2-popup">
+                <h5>Assign Job To:</h5>
+                <div class="form-group">
+                    <select class="form-control" multiple id="slct-cleaner-job-makelive">
+                        @*<option value="0">Select Cleaners</option>*@
+                        @foreach (var cleaner in new EntitiesLibrary.Data.DropdownData().GetCleaner())
+                        {
+                            <option value="@cleaner.Value">@cleaner.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span style="padding-top:11px; display:inline-block; font-weight:700;">Price to cleaner:</span>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="admin-job-master-price" class="form-control" />
+                            <span id="spn-admin-jobprice" style="display:none;color:red;">Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-default popup-btn center-block admin-make-joblive-selected-cleaner" data-price="@(job!=null?job.PriceString:"")" data-cleanerid="@(Data!=null?Data.Id:0)" data-jobid="@Model.jobId">Send</a>
+                </div>
+                <h4 class="text-center">Or</h4>
+                <div class="form-group">
+                    <a class="btn btn-default popup-btn center-block admin-make-joblive-all-cleaner" data-price="@(job!=null?job.PriceString:"")" data-cleanerid="@(Data!=null?Data.Id:0)" data-jobid="@Model.jobId">Send to All Cleaner</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br><br><br>
+
+<link href="~/Content/Plugin/MultiSelectDropdownList/jquery.multiselect.css" rel="stylesheet" />
+<script src="~/Content/Plugin/MultiSelectDropdownList/jquery.multiselect.js"></script>
+
+
+<script>
+    $(function () {
+        $('select[multiple]').multiselect({
+            columns: 3,
+            placeholder: 'Select Cleaners',
+            search: true,
+            searchOptions: {
+                'default': 'Search Cleaners'
+            }
+            //selectAll: true
+        });
+
+    });
+</script>
+
+<script>
+
+    $(document).on('keydown', "#admin-job-master-price , #admin-counteroffer-price", function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+
+    $(document).on('click', '.admin-make-joblive-selected-cleaner', function () {
+        var source = $(this);
+        var checkBoxStatus = false;
+        var cleanerIds = "";
+        $('input[type=checkbox]').each(function (index, element) {
+            if ($(this).prop('checked') == true) {
+                cleanerIds = cleanerIds + $(this).val() + ',';
+                
+                checkBoxStatus = true;
+            }
+        });
+        cleanerIds = cleanerIds.slice(0, -1);
+        var value = $("#slct-cleaner-job-makelive option:selected").val();
+        var price = $('#admin-job-master-price').val();
+        //if (value == "0") {
+        //    toastr.error("Select a cleaner");
+        //}
+        setTimeout(function () {
+
+            if (checkBoxStatus == false) {
+                toastr.error("Select a cleaner");
+                if (price == "") {
+                    $('#spn-admin-jobprice').text("Required").show();
+                }
+            }
+            else {
+                if (price == "") {
+                   
+                    $('#spn-admin-jobprice').text("Required").show();
+                }
+                else {
+                    var jobPrice = $(source).attr('data-price');
+                    if (parseInt(jobPrice) < parseInt(price)) {
+
+                        $('#spn-admin-jobprice').hide();
+                        var jobId = $(source).attr('data-jobid');
+                        var cleanerId = $(source).attr('data-cleanerid');
+                        var obj = new Object();
+                        obj.cleanerId = cleanerId;
+                        obj.newPrice = price;
+                        obj.jobId = jobId;
+                        obj.forAll = "false";
+                        obj.cleanerIds = cleanerIds;
+                        obj.AdminInstructions = "";
+                        $.ajax({
+                            url: '/Cleaner/makejoblive',
+                            type: "POST",
+                            data: obj,
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Status) {
+                                    toastr.success("Job made live");
+                                    setTimeout(function () {
+                                        window.location.href = "/Cleaner/viewjobs";
+                                    }, 300);
+                                }
+                                else {
+                                    toastr.error(data.Message);
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        alert();
+                        $('#spn-admin-jobprice').text("Price must be higher than job price").show();
+                    }
+                }
+            }
+        }, 300);
+    });
+
+    $(document).on('click', '.admin-make-joblive-all-cleaner', function () {
+
+        var source = $(this);
+        var price = $('#admin-job-master-price').val();
+        if (price == "") {
+            $('#spn-admin-jobprice').text("Required").show();
+        }
+        else {
+            var jobPrice = $(this).attr('data-price');
+            if (parseInt(jobPrice) < parseInt(price)) {
+                $('#spn-admin-jobprice').hide();
+                var jobId = $(this).attr('data-jobid');
+                var cleanerId = $(this).attr('data-cleanerid');
+                var obj = new Object();
+                obj.cleanerId = cleanerId;
+                obj.newPrice = price;
+                obj.jobId = jobId;
+                obj.forAll = "true";
+                obj.cleanerIds = "";
+                obj.AdminInstructions = "";
+
+                $.ajax({
+                    url: '/Cleaner/makejoblive',
+                    type: "POST",
+                    data: obj,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.Status) {
+                            toastr.success("Job made live");
+                            setTimeout(function () {
+                                window.location.href = "/Cleaner/viewjobs";
+                            }, 300);
+                        }
+                        else {
+                            toastr.error(data.Message);
+                        }
+                    }
+                });
+            }
+            else {
+                $('#spn-admin-jobprice').text("Counter offer must be higher than job price").show();
+            }
+        }
+    });
+
+    $(document).on('click', '.cleaner-accept-job', function () {
+
+        var source = $(this);
+        var jobId = $(this).attr('data-jobid');
+        var cleanerId = $(this).attr('data-cleanerid');
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.jobId = jobId;
+        $.ajax({
+            url: '/Cleaner/acceptjob',
+            type: "POST",
+            data: obj,
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+                    toastr.success(data.Message);
+                    setTimeout(function () {
+                        window.location.href = "/Cleaner/viewjobs";
+                    }, 300);
+                }
+                else {
+                    toastr.error(data.Message);
+                }
+            }
+        });
+    });
+
+
+    $(document).on('click', '#admin-submit-counteroffer', function () {
+
+        var source = $(this);
+        var price = $('#admin-counteroffer-price').val();
+        if (price == "") {
+            $('#spn-admin-counteroffer-price').text("Required").show();
+        }
+        else {
+            var jobPrice = $(this).attr('data-price');
+            if (parseInt(jobPrice) < parseInt(price)) {
+                $('#spn-admin-counteroffer-price').hide();
+                var jobId = $(this).attr('data-jobid');
+                var cleanerId = $(this).attr('data-cleanerid');
+                var obj = new Object();
+                obj.CleanerId = cleanerId;
+                obj.Price = price;
+                obj.JobId = jobId;
+                $.ajax({
+                    url: '/Cleaner/postcounteroffer',
+                    type: "POST",
+                    data: obj,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.Status) {
+                            toastr.success("Counter offer posted");
+                            setTimeout(function () {
+                                location.reload();
+                            }, 300);
+                        }
+                        else {
+                            toastr.error(data.Message);
+                        }
+                    }
+                });
+            }
+            else {
+                $('#spn-admin-counteroffer-price').text("Counter offer must be higher than job price").show();
+            }
+        }
+
+    });
+
+</script>

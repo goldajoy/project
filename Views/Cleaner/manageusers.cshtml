@@ -1,0 +1,259 @@
+﻿@model ClassLibrary.WebModels.ManageUsersModel
+@{
+    ViewBag.Title = "manageusers";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+}
+@Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.userRole, new { Value = Model.userRole })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    Manage User
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="innr-bdy-btn">
+                    <a class="active change-manageusers" style="cursor:pointer;" data-value="@ClassLibrary.Enum.UserRole.User">User</a>
+                    <a class=" change-manageusers" style="cursor:pointer;" data-value="@ClassLibrary.Enum.UserRole.Cleaner">Cleaner</a>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <div class="row" id="div-user-list">
+            @Html.Partial("~/Views/Cleaner/_pv_Manageusers_user_list.cshtml", Model)
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-user-list-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.ManageUsersModelPagenation();
+                        model.cleanerId = Model.cleanerId;
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.userRole = Model.userRole;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_Manageusers_user_list_pagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br>
+
+
+<script>
+
+    $(document).on('click', '.change-manageusers', function () {
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+
+        var value = $(this).attr('data-value');
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = 0;
+        obj.userRole = value;
+        $.ajax({
+            url: '/Cleaner/RefreshManageusersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('.change-manageusers').removeClass('active');
+                $(source).addClass('active');
+                $('#div-user-list').html(data);
+                $('#userRole').val(value);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.userRole = value;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManageusersListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-list-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+
+            }
+        });
+    });
+
+
+    $(document).on('click', '.a-cleaner-manageusers-pageChange-next', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#userRole').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) + parseInt(1);
+        obj.userRole = value;
+        $.ajax({
+            url: '/Cleaner/RefreshManageusersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-list').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.userRole = value;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManageusersListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-list-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-manageusers-pageChange-prev', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#userRole').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) - parseInt(1);
+        obj.userRole = value;
+        $.ajax({
+            url: '/Cleaner/RefreshManageusersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-list').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.userRole = value;
+                $.ajax({
+                    url: '/Cleaner/RefreshManageusersListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-list-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+    function RefreshList() {
+        var cleanerId = $('#cleanerId').val();
+        var value = $('#userRole').val();
+        var index = $('#index').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = index;
+        obj.userRole = value;
+        $.ajax({
+            url: '/Cleaner/RefreshManageusersList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-list').html(data);
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.userRole = value;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManageusersListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-list-pagination').html(result);
+                    }
+                });
+
+
+            }
+        });
+    }
+
+    $(document).on('click', '.admin-delete-User', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You are about to delete this user!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var userId = $(source).attr('data-userid');
+            var obj = new Object();
+            obj.userId = userId;
+
+            $.ajax({
+                url: '/Cleaner/adminDeleteUser',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            RefreshList();
+                        }, 200);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+
+</script>
+

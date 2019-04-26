@@ -1,0 +1,184 @@
+﻿@model ClassLibrary.WebModels.CleanerMyJobsModel
+@{
+    ViewBag.Title = "myjobs";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+}
+@Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.JobStatus, new { Value = Model.JobStatus })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    My Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="innr-bdy-btn">
+                    <a class="active a-cleaner-myjobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.Accepted">Open Jobs</a>
+                    <a class="a-cleaner-myjobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.Completed">Closed Jobs</a>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+    
+
+
+        <div class="row" id="div-cleaner-myjobs">
+            @Html.Partial("~/Views/Cleaner/_pv_Cleaner_Myjobs_list.cshtml", Model)
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-cleaner-myjobs-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.CleanerMyJobsModelPagenation();
+                        model.cleanerId = Model.cleanerId;
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.JobStatus = Model.JobStatus;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_CleanerMyJobsPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br>
+
+
+<script>
+
+    $(document).on('click', '.a-cleaner-myjobs', function () {
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+      
+        var value = $(this).attr('data-value');
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = 0;
+        obj.JobStatus = value;
+        $.ajax({
+            url: '/Cleaner/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('.a-cleaner-myjobs').removeClass('active');
+                $(source).addClass('active');
+                $('#div-cleaner-myjobs').html(data);
+                $('#JobStatus').val(value);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.JobStatus = value;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+
+            }
+        });
+    });
+
+
+    $(document).on('click', '.a-cleaner-myjob-pageChange-next', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index =parseInt(index) + parseInt(1);
+        obj.JobStatus = value;
+        $.ajax({
+            url: '/Cleaner/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-myjobs').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.JobStatus = value;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-myjob-pageChange-prev', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) - parseInt(1);
+        obj.JobStatus = value;
+        $.ajax({
+            url: '/Cleaner/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-myjobs').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.JobStatus = value;
+                $.ajax({
+                    url: '/Cleaner/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+
+</script>

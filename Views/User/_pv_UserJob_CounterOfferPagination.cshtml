@@ -1,0 +1,20 @@
+﻿@model ClassLibrary.WebModels.UserJobCounterOfferPaginationModel
+@{
+    var job = new EntitiesLibrary.Data.Job(Convert.ToInt64(Model.jobId));
+}
+@if (Model.currentIndex > 0)
+{
+    <li><a class="a-user-jobCounteroffer-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (job != null)
+{
+    if (job.CounterOffers.Count > 0)
+    {
+        int index = Convert.ToInt32(Model.nextIndex);
+        if (job.CounterOffers.Skip(index * 6).Take(6).ToList().Count > 0)
+        {
+            <li><a class="a-user-jobCounteroffer-pageChange-next" style="cursor:pointer;">Next</a></li>
+        }
+    }
+}

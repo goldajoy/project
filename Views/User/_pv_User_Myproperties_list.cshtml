@@ -1,0 +1,51 @@
+﻿@model ClassLibrary.WebModels.UserMyPropertiesModel
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+
+@if (Data != null)
+{
+    if (Data.UserProperties.Count > 0)
+    {
+        int index = Convert.ToInt32(Model.index);
+        foreach (var property in Data.UserProperties.Skip(index * 6).Take(6).ToList())
+        {
+            <div class="col-md-6">
+                <div class="job">
+                    <div class="job-header">
+                        @if (property.PropertyName != null && property.PropertyName != string.Empty)
+                        {
+                            <span><strong>@(property.PropertyName ?? string.Empty)</strong></span>
+                        }
+                        else
+                        {
+                            <span>&nbsp;</span>
+                        }
+                    
+                        @if (property.Address != null && property.Address != string.Empty)
+                        {
+                           <span class="pull-right">@(property.Address ?? string.Empty)</span>
+                        }
+                        else
+                        {
+                            <span>&nbsp;</span>
+                        }   
+
+                        
+                    </div><!-- /job-header -->
+                    <div class="job-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="btn-controls">
+                                    <a href="/User/editproperty/@property.PropertyId" class="btn edit">Edit</a>
+                                    <a href="/User/viewproperty/@property.PropertyId" class="btn view">View</a>
+                                    <a class="btn delete user-delete-property" data-userid="@Data.UserId" data-propertyid="@property.PropertyId">Delete</a>
+                                </div>
+                            </div>
+                        </div><!-- /row -->
+                    </div><!-- /job-body-->
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+        }
+    }
+}

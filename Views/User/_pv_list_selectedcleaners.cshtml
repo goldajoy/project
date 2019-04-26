@@ -1,0 +1,23 @@
+﻿@model ClassLibrary.WebModels.MyCleanersViewModel
+@{
+    var data = new EntitiesLibrary.Data.WebService().fetchUserSelectedCleaners(Model.userId);
+}
+
+@if (data.Skip(Model.index * 6).Take(6).ToList().Count > 0)
+{
+    foreach (var item in data.Skip(Model.index * 6).Take(6).ToList())
+    {
+        <div class="col-md-6">
+            <div class="cleaners">
+                <img class="img-responsive" style="width:63px;border-radius:50%;" src="@item.PROFILEIMAGE">
+                <div class="cleanerName">
+                    <h4>@item.FIRSTNAME @item.LASTNAME</h4>
+                    <h5><i class="fa fa-phone"></i> @item.PHONE</h5>
+                </div>
+                <div class="cleanerBtn">
+                    <a class="btn delete user-delete-selectedcleaner" data-userid="@Model.userId" data-cleanerid="@item.CLEANERID">Delete</a>
+                </div>
+            </div><!-- /cleaners-->
+        </div><!-- /col-md-6 -->
+    }
+}

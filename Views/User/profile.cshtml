@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "profile";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    Profile
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="profile">
+                    <div class="profile-icon">
+                        @if (Data != null)
+                        {
+                            if (Data.ProfilePic != null && Data.ProfilePic != string.Empty)
+                            {
+                                <img class="img-responsive img-circle center-block" style="max-width: 184px;max-height: 184px;" src="@Data.ProfilePic" />
+                            }
+                            else
+                            {
+                                <img class="img-responsive img-circle center-block" style="max-width: 184px;max-height: 184px;" src="/Content/images/icons/profile-icon.png" />
+                            }
+                        }
+                        else
+                        {
+                            <img class="img-responsive img-circle center-block" style="max-width: 184px;max-height: 184px;" src="/Content/images/icons/profile-icon.png" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <br><br>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="personal-details" style="margin:auto; display:table;">
+                    <img src="/Content/images/icons/personal-details.png" />
+                    <span>Personal Details</span>
+                </div><!-- /personal-details -->
+            </div><!-- /col-lg-12 col-md-12 col-sm-12 col-xs-12 -->
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="profile-details">
+                        <ul>
+                            <li><i class="fa fa-user"></i> @(Data != null ? Data.FirstName ?? string.Empty + " " + Data.LastName ?? string.Empty : "")</li>
+                            <li><i class="fa fa-envelope"></i> @(Data != null ? Data.Email : "")</li>
+                            <li><i class="fa fa-phone"></i> @(Data != null ? Data.Phone : "")</li>
+                            <li><i class="fa fa-map-marker"></i> @(Data != null ? Data.Suburb : ""), @(Data != null ? Data.State : "")</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>

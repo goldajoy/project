@@ -1,0 +1,148 @@
+﻿@model ClassLibrary.WebModels.CleanerMyJobsModel
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var jobList = new EntitiesLibrary.Data.WebService().cleanerListMyJobs(Model);
+}
+
+
+@if (jobList.Count > 0)
+{
+
+    foreach (var item in jobList)
+    {
+        <div class="col-md-6">
+            <div class="job">
+                <div class="job-header">
+                    @if (item.PropertyDetail != null)
+                    {
+                        if (item.PropertyDetail.PropertyName != null && item.PropertyDetail.PropertyName != string.Empty)
+                        {
+                            <span>@item.PropertyDetail.PropertyName</span>
+                        }
+                        else
+                        {
+                            <span>&nbsp;</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>&nbsp;</span>
+                    }
+                    @if (Data != null)
+                    {
+                        if (Data.IsAdmin)
+                        {
+
+                            <span class="pull-right">$@(item.PriceString == "" ? "0" : item.PriceString)</span>
+                        }
+                        else
+                        {
+                            <span class="pull-right">$@(item.AdminPriceString == "" ? "0" : item.AdminPriceString)</span>
+
+                        }
+                    }
+                    @*<span class="pull-right">@item.DatetoBrowser.ToString("yyyy-MM-dd")</span>*@
+                    @try
+                    {
+                        <span class="pull-right">@item.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                        <span class="pull-right">@item.DatetoBrowser.ToString("hh:mm tt")</span>
+                    }
+                    catch (Exception ex)
+                    {
+                        <span class="pull-right">@item.Date1.ToString("dd-MM-yyyy")</span>
+                        <span class="pull-right">@item.Date1.ToString("hh:mm tt")</span>
+                    }
+                </div><!-- /job-header -->
+                <div class="job-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!--<i class="fa fa-map-marker"></i>-->
+                            <img src="~/Content/images/icons/location.png" class="location-img" />
+                            <span>
+                                @((item.PropertyDetail == null ? "" : item.PropertyDetail.Address ?? string.Empty)),
+                                @((item.PropertyDetail == null ? "" : item.PropertyDetail.Suburb ?? string.Empty)) @((item.PropertyDetail == null ? "" : item.PropertyDetail.State ?? string.Empty)),
+                                @((item.PropertyDetail == null ? "" : item.PropertyDetail.Country ?? string.Empty))
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            @if (Model.JobStatus == ClassLibrary.Enum.JobStatus.Accepted)
+                            {
+                                <span class="pull-right">Accepted</span>
+                            }
+                            else
+                            {
+                                <span class="pull-right">STATUS: Completed </span>
+                            }
+                            <div class="job-btn">
+                                @if (Model.JobStatus == ClassLibrary.Enum.JobStatus.Completed)
+                                {
+                                    if (Convert.ToBoolean(item.IsFeedbackGiven))
+                                    {
+                                        <a style="cursor:pointer;" data-ratingvalue="@(item.feedback!=null?item.feedback.Ratingstring:"")" data-text="@(item.feedback!=null?item.feedback.Text:"")" class="pending-btn view-feedback-btn view-job-feedback">View Feedback</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="pending-btn"style="cursor:default;">Pending Feedback</a>
+                                    }
+                                }
+                                <a href="/Cleaner/myjobdetails/@item.JobIdString" class="view-btn">View</a>
+                            </div>
+                        </div>
+                    </div><!-- /row -->
+                </div><!-- /job-body-->
+            </div><!-- /job -->
+        </div><!-- /col-md-6 -->
+
+    }
+}
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none;">
+                <button type="button" class="close popup-close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="font-weight: bold;">Rating and Comment</h4>
+            </div>
+            <div class="modal-body detail2-popup" style="pointer-events:none;">
+                <div class="form-group" style="text-align: center; font-size: 30px;">
+                    <div class="row" id="rating-div">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <textarea rows="3" id="txt-feedback" placeholder="Feedback" class="form-control"></textarea>
+                        @*<input type="text" id="txt-email" placeholder="email" class="form-control" />*@
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/Plugin/Rating/simple-rating.css" rel="stylesheet" />
+<script>
+
+    $(document).on('click', '.view-job-feedback', function () {
+        var source = $(this);
+        var ratingValue = $(this).attr('data-ratingvalue');
+        var ratingText = $(this).attr('data-text');
+        //$('#rating-value').val(ratingValue);
+        var appendString = "";
+        for (i = 0; i < parseInt(ratingValue) ; i++) {
+            appendString = appendString + '<i class="fa fa-star" style="color: #f5ba00;margin-left: 1px;"></i>'
+        }
+        for (i = parseInt(ratingValue) ; i < 5  ; i++) {
+            appendString = appendString + '<i class="fa fa-star-o" style="color: #f5ba00;margin-left: 1px;"></i>'
+        }
+
+        $('#txt-feedback').val(ratingText);
+        $('#rating-div').html(appendString);
+        //$('.rating').rating();
+        $('#myModal').modal('show');
+    });
+
+</script>

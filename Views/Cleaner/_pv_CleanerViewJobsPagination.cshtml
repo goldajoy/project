@@ -1,0 +1,14 @@
+﻿@model ClassLibrary.WebModels.CleanerViewJobsPagination
+@{
+    var jobListCountIndex = new EntitiesLibrary.Data.WebService().cleanerListViewJobsCount(Model);
+}
+
+@if (Model.currentIndex > 0)
+{
+    <li><a class="a-cleaner-viewjob-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (jobListCountIndex > 0)
+{
+    <li><a class="a-cleaner-viewjob-pageChange-next" style="cursor:pointer;">Next</a></li>
+}

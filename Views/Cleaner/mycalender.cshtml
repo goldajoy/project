@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "mycalender";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+}
+<div class="preloder2">
+    <div class="loder">
+        <img src="~/Content/Images/logo.png" class="loder-img" />
+        <span>Please wait loading...</span>
+    </div>
+</div>
+<input type="hidden" id="hfn-userid" value="@(Data!=null?Data.UserId:"")" />
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    My Calendar
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="calendar-info-main">
+                    <ul class="calendar-info">
+                        <li><b></b><span>Current Date</span></li>
+                        <li><b></b><span>Upcoming</span></li>
+                        <li><b></b><span>Completed</span></li>
+                    </ul>
+                </div>
+                <div class="calendar-custom">
+                    <div id="calendar">
+
+
+                    </div>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <div class="calendar-details">
+            <div class="row" id="div-myCalender-joblist">
+                @*@{
+                        var model = new ClassLibrary.WebModels.CLeanerJobsByDate();
+                        model.CleanerId = Model.cleanerId;
+                        model.TimeZone = "";
+                        model.Date = sys;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_ViewCleanerJobsByDate.cshtml", model)*@
+            </div><!-- /row -->
+        </div>
+
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+
+<link href="~/Content/css/fullcalendar.css" rel="stylesheet" />
+<script src="~/Content/js/moment.min.js"></script>
+<script src="~/Content/js/fullcalendar.js"></script>
+<script>
+
+    function getTimezoneName() {
+        timezone = jstz.determine()
+        return timezone.name();
+    }
+
+    $(document).ready(function () {
+        //$('#preloder2').show();
+        var timezone = getTimezoneName();
+
+        $.ajax({
+            url: '/Cleaner/getCleanerDates/' + $('#hfn-userid').val(),
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.Status) {
+
+                    var localDate = new Date();
+                    var month = localDate.getMonth() + 1;
+                    var day = localDate.getDate();
+
+                    var output = localDate.getFullYear() + '/' +
+    (('' + month).length < 2 ? '0' : '') + month + '/' +
+    (('' + day).length < 2 ? '0' : '') + day;
+
+                    var calenderObj = new Object();
+                    calenderObj.CleanerId = $('#hfn-userid').val();
+                    calenderObj.Date = (('' + month).length < 2 ? '0' : '') + month + '/' + (('' + day).length < 2 ? '0' : '') + day + '/' + localDate.getFullYear();
+                    calenderObj.TimeZone = timezone;
+
+                    $.ajax({
+                        url: '/Cleaner/RefreshMyCalenderJobList',
+                        type: "POST",
+                        data: calenderObj,
+                        dataType: 'html',
+                        success: function (data12) {
+                            $('#div-myCalender-joblist').html(data12);
+                        }
+                    });
+
+                    var today = new Date();
+                    var todayDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+                    $('#calendar').fullCalendar({
+                        header: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'month,basicWeek,basicDay'
+                        },
+                        defaultDate: today,
+                        navLinks: true, // can click day/week names to navigate views
+                        editable: true,
+                        eventLimit: true, // allow "more" link when too many events
+                        dayRender: function (date, cell) {
+                            cell.css("cursor", "pointer");
+                            var value3 = (date.month() + 1) + '/' + date.date() + '/' + date.year();
+                            //console.log(data.Dates);
+                            if (data.Dates != null) {
+                                $.each(data.Dates.CompletedJobDates, function (i) {
+                                    $.each(data.Dates.CompletedJobDates[i], function (key, val) {
+                                        var date1 = new Date(val + ' UTC');
+                                        var value1 = (date1.getMonth() + 1) + '/' + date1.getDate() + '/' + date1.getFullYear();
+                                        var value2 = (date.month() + 1) + '/' + date.date() + '/' + date.year();
+                                        if (value1 === value2) {
+                                            //cell.css("background-color", "#f08904");
+                                            //cell.css("background-color", "#ed2e2d");
+                                            cell.css("background-color", "#4cc51b");
+                                        }
+                                    });
+                                });
+                                $.each(data.Dates.PendingJobDates, function (i) {
+                                    $.each(data.Dates.PendingJobDates[i], function (key, val) {
+                                        var date1 = new Date(val + ' UTC');
+                                        var value1 = (date1.getMonth() + 1) + '/' + date1.getDate() + '/' + date1.getFullYear();
+                                        var value2 = (date.month() + 1) + '/' + date.date() + '/' + date.year();
+                                        if (value1 === value2) {
+                                            //cell.css("background-color", "#f08904");
+                                            //cell.css("background-color", "#4cc51b");
+                                            cell.css("background-color", "#ed2e2d");
+                                        }
+                                    });
+                                });
+                                if (todayDate == value3)
+                                    cell.css("background-color", "#f08904");
+                            }
+                            else {
+                                if (todayDate == value3)
+                                    cell.css("background-color", "#f08904");
+                            }
+                        },
+                        dayClick: function (date, cell) {
+                            var calenderObj1 = new Object();
+                            calenderObj1.CleanerId = $('#hfn-userid').val();
+                            calenderObj1.Date = (('' + (date.month() + 1)).length < 2 ? '0' : '') + (date.month() + 1) + '/' + (('' + date.date()).length < 2 ? '0' : '') + date.date() + '/' + date.year();
+                            //calenderObj1.Date = (date.month() + 1) + '/' + date.date() + '/' + date.year();
+                            calenderObj1.TimeZone = timezone;
+                            console.log(calenderObj1);
+                            $.ajax({
+                                url: '/Cleaner/RefreshMyCalenderJobList',
+                                type: "POST",
+                                data: calenderObj1,
+                                dataType: 'html',
+                                success: function (data122) {
+                                    $('#div-myCalender-joblist').html(data122);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+        setTimeout(function () {
+            $(".preloder2").fadeOut();
+        }, 1000);
+    });
+
+</script>

@@ -1,0 +1,14 @@
+﻿@model ClassLibrary.WebModels.UserMyJobsPaginationModel
+@{
+    var jobListCountIndex = new EntitiesLibrary.Data.WebService().fetchUserJobsCount(Model);
+}
+
+@if (Model.currentIndex > 0)
+{
+    <li><a class="a-user-myjob-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (jobListCountIndex > 0)
+{
+    <li><a class="a-user-myjob-pageChange-next" style="cursor:pointer;">Next</a></li>
+}

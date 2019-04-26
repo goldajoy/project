@@ -1,0 +1,335 @@
+﻿@model ClassLibrary.WebModels.CleanerViewJobsFilter
+@{
+    ViewBag.Title = "viewjobs";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+}
+
+@Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+@Html.HiddenFor(m => m.Lat, new { Value = Model.Lat })
+@Html.HiddenFor(m => m.Long, new { Value = Model.Long })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    View Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="view-job-top">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>$ Price</label>
+                        <select class="form-control" id="cleaner-viewjobs-price-filter">
+                            <option value="0">All</option>
+                            <option value="High-Low">$ High-Low</option>
+                            <option value="Low-High">$ Low-High</option>
+                        </select>
+                    </div>
+                </div><!-- /col-md-4 -->
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Distance Km</label>
+                        <select class="form-control" id="cleaner-viewjobs-distance-filter">
+                            <option value="0">All</option>
+                            <option value="0-10">0-10 Km</option>
+                            <option value="10-20">10-20 Km</option>
+                            <option value="20-More">20-More Km</option>
+                        </select>
+                    </div>
+                </div><!-- /col-md-4 -->
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select class="form-control" id="cleaner-viewjobs-type-filter">
+                            <option value="@ClassLibrary.Enum.PropertyType.All">All</option>
+                            <option value="@ClassLibrary.Enum.PropertyType.Airbnb">Airbnb</option>
+                            <option value="@ClassLibrary.Enum.PropertyType.Domestic">Domestic</option>
+                            <option value="@ClassLibrary.Enum.PropertyType.Commercial">Commercial</option>
+                        </select>
+                    </div>
+                </div><!-- /col-md-4 -->
+            </div>
+        </div><!-- /row -->
+
+        <div class="row" id="div-cleaner-viewjobs">
+
+            @Html.Partial("~/Views/Cleaner/_pv_Cleaner_Viewjobs_list.cshtml", Model)
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-cleaner-viewjobs-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.CleanerViewJobsPagination();
+                        model.cleanerId = Model.cleanerId;
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.distance = "All";
+                        model.price = "All";
+                        model.type = ClassLibrary.Enum.PropertyType.All;
+                        model.Lat = Model.Lat;
+                        model.Long = Model.Long;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_CleanerViewJobsPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+
+
+<script>
+
+    $(document).on('change', '#cleaner-viewjobs-price-filter', function () {
+        $('#index').val(0);
+        RefreshList();
+    });
+    $(document).on('change', '#cleaner-viewjobs-type-filter', function () {
+        $('#index').val(0);
+        RefreshList();
+    });
+    $(document).on('change', '#cleaner-viewjobs-distance-filter', function () {
+        $('#index').val(0);
+        RefreshList();
+    });
+
+    function RefreshList() {
+        var cleanerId = $('#cleanerId').val();
+        var lat = $('#Lat').val();
+        var long = $('#Long').val();
+        var index = $('#index').val();
+        var price = $("#cleaner-viewjobs-price-filter option:selected").val();
+        var distance = $("#cleaner-viewjobs-distance-filter option:selected").val();
+        var type = $("#cleaner-viewjobs-type-filter option:selected").val();
+        var obj = new Object();
+        obj.price = price;
+        obj.distance = distance;
+        obj.type = type;
+        obj.cleanerId = cleanerId;
+        obj.Lat = lat;
+        obj.Long = long;
+        obj.index = index;
+
+
+        $.ajax({
+            url: '/Cleaner/checkViewJobsCount',
+            type: "POST",
+            data: obj,
+            dataType: 'json',
+            success: function (data1) {
+                if (data1.Count <= 0) {
+                    $('#index').val(parseInt(index) - parseInt(1));
+                }
+               var newindex = $('#index').val();
+
+                var newobj1 = new Object();
+                newobj1.price = price;
+                newobj1.distance = distance;
+                newobj1.type = type;
+                newobj1.cleanerId = cleanerId;
+                newobj1.nextIndex = parseInt(newindex) + parseInt(1);
+                newobj1.currentIndex = parseInt(newindex);
+                newobj1.Lat = lat;
+                newobj1.Long = long;
+
+
+                $.ajax({
+                    url: '/Cleaner/RefreshViewJobsList',
+                    type: "POST",
+                    data: newobj1,
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#div-cleaner-viewjobs').html(data);
+
+                        var newobj = new Object();
+                        newobj.price = price;
+                        newobj.distance = distance;
+                        newobj.type = type;
+                        newobj.cleanerId = cleanerId;
+                        newobj.nextIndex = parseInt(newindex) + parseInt(1);
+                        newobj.currentIndex = parseInt(newindex);
+                        newobj.Lat = lat;
+                        newobj.Long = long;
+
+                        $.ajax({
+                            url: '/Cleaner/RefreshViewJobsListPagination',
+                            type: "POST",
+                            data: newobj,
+                            dataType: 'html',
+                            success: function (result) {
+                                $('#div-cleaner-viewjobs-pagination').html(result);
+                                //$('#index').val(newindex);
+                            }
+                        });
+
+                    }
+                });
+            }
+        });
+
+    }
+
+</script>
+
+
+<script>
+
+    $(document).on('click', '.cleaner-delete-Userjob', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var cleanerId = $('#cleanerId').val();
+            var jobId = $(source).attr('data-jobID');
+            var obj = new Object();
+            obj.jobId = jobId;
+            obj.cleanerId = cleanerId;
+
+            $.ajax({
+                url: '/Cleaner/removeJobFromList',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            RefreshList();
+                        }, 200);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-viewjob-pageChange-prev', function () {
+
+        var cleanerId = $('#cleanerId').val();
+        var lat = $('#Lat').val();
+        var long = $('#Long').val();
+        var index = $('#index').val();
+        var price = $("#cleaner-viewjobs-price-filter option:selected").val();
+        var distance = $("#cleaner-viewjobs-distance-filter option:selected").val();
+        var type = $("#cleaner-viewjobs-type-filter option:selected").val();
+        var obj = new Object();
+        obj.price = price;
+        obj.distance = distance;
+        obj.type = type;
+        obj.cleanerId = cleanerId;
+        obj.Lat = lat;
+        obj.Long = long;
+        obj.index = parseInt(index) - parseInt(1);
+
+        $.ajax({
+            url: '/Cleaner/RefreshViewJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-viewjobs').html(data);
+
+                var newobj = new Object();
+                newobj.price = price;
+                newobj.distance = distance;
+                newobj.type = type;
+                newobj.cleanerId = cleanerId;
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.Lat = lat;
+                newobj.Long = long;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshViewJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-viewjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-viewjob-pageChange-next', function () {
+
+        var cleanerId = $('#cleanerId').val();
+        var lat = $('#Lat').val();
+        var long = $('#Long').val();
+        var index = $('#index').val();
+        var price = $("#cleaner-viewjobs-price-filter option:selected").val();
+        var distance = $("#cleaner-viewjobs-distance-filter option:selected").val();
+        var type = $("#cleaner-viewjobs-type-filter option:selected").val();
+        var obj = new Object();
+        obj.price = price;
+        obj.distance = distance;
+        obj.type = type;
+        obj.cleanerId = cleanerId;
+        obj.Lat = lat;
+        obj.Long = long;
+        obj.index = parseInt(index) + parseInt(1);
+
+        $.ajax({
+            url: '/Cleaner/RefreshViewJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-viewjobs').html(data);
+
+                var newobj = new Object();
+                newobj.price = price;
+                newobj.distance = distance;
+                newobj.type = type;
+                newobj.cleanerId = cleanerId;
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.Lat = lat;
+                newobj.Long = long;
+
+                $.ajax({
+                    url: '/Cleaner/RefreshViewJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-viewjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+</script>

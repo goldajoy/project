@@ -1,0 +1,100 @@
+﻿@model ClassLibrary.WebModels.CLeanerJobsByDate
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var jobs = new EntitiesLibrary.Data.WebService().cleanerJobsDetailsByDate(Model);
+}
+
+@if (jobs.Count > 0)
+{
+    foreach (var item in jobs)
+    {
+        <div class="co-lg-6 col-md-6 col-sm-6 col-xs-12">
+            @if (item.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString())
+            {
+                <div class="details-list details-list-2" style="min-height: 70px;">
+                    <ul>
+                        @if (item.PropertyDetail != null)
+                    {
+                        if (item.PropertyDetail.Suburb != string.Empty)
+                        {
+                        <li>@item.PropertyDetail.Suburb</li>
+                        }
+                        else
+                        {
+                        <li>&nbsp;</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>&nbsp;</li>
+                    }
+
+                        @try
+                    {
+                        <li>@item.DatetoBrowser.ToString("hh:mm tt")</li>
+                    }
+                    catch (Exception ex)
+                    {
+                        <li>@item.Date1.ToString("hh:mm tt")</li>
+                    }
+                        @if (Data != null)
+                    {
+                        if (Data.IsAdmin)
+                        {
+                        <li>$@(item.PriceString == "" ? "0" : item.PriceString)</li>
+                        }
+                        else
+                        {
+                        <li>$@(item.AdminPriceString == "" ? "0" : item.AdminPriceString)</li>
+                        }
+                    }
+                        <li><a href="/Cleaner/myjobdetails/@item.JobIdString" class="btn btn-default view-job-btn view-btn">View</a></li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="details-list details-list-2" style="min-height: 70px; border: 2px solid #ed2e2d !important; ">
+                    <ul>
+                        @if (item.PropertyDetail != null)
+                        {
+                            if (item.PropertyDetail.Suburb != string.Empty)
+                            {
+                                <li>@item.PropertyDetail.Suburb</li>
+                            }
+                            else
+                            {
+                                <li>&nbsp;</li>
+                            }
+                        }
+                        else
+                        {
+                            <li>&nbsp;</li>
+                        }
+
+                        @try
+                        {
+                            <li>@item.DatetoBrowser.ToString("hh:mm tt")</li>
+                        }
+                        catch (Exception ex)
+                        {
+                            <li>@item.Date1.ToString("hh:mm tt")</li>
+                        }
+                        @if (Data != null)
+                        {
+                            if (Data.IsAdmin)
+                            {
+                                <li>$@(item.PriceString == "" ? "0" : item.PriceString)</li>
+                            }
+                            else
+                            {
+                                <li>$@(item.AdminPriceString == "" ? "0" : item.AdminPriceString)</li>
+                            }
+                        }
+                        <li><a href="/Cleaner/myjobdetails/@item.JobIdString" class="btn btn-default view-job-btn view-btn">View</a></li>
+                    </ul>
+                </div>
+            }
+        </div><!-- /co-lg-6 col-md-6 col-sm-6 col-xs-12 -->
+    }
+}

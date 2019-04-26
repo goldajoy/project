@@ -1,0 +1,14 @@
+﻿@model ClassLibrary.WebModels.ManageUsersModelPagenation
+    @{
+        var userListCount = new EntitiesLibrary.Data.WebService().getUserslistCount(Model);
+    }
+
+    @if (Model.currentIndex > 0)
+    {
+        <li><a class="a-cleaner-manageusers-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+    }
+
+    @if (userListCount > 0)
+    {
+        <li><a class="a-cleaner-manageusers-pageChange-next" style="cursor:pointer;">Next</a></li>
+    }

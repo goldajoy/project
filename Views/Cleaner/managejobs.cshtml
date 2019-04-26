@@ -1,0 +1,450 @@
+﻿@model ClassLibrary.WebModels.ManageJobsModel
+@{
+    ViewBag.Title = "managejobs";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+}
+
+@Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.jobStatus, new { Value = Model.jobStatus })
+@Html.HiddenFor(m => m.workType, new { Value = Model.workType })
+
+<style>
+   
+</style>
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    Manage Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="innr-bdy-btn">
+                    <a class="active a-user-managejobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.fetchAll">Open Jobs</a>
+                    <a class="a-user-managejobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.Completed">Closed Jobs</a>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <div id="div-openjob-filter" class="row">
+            <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                <div class="form-group" style="padding-top:10px;">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" class="radio-pending" id="pending" name="rp">
+                                <label for="pending">Pending</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" class="radio-accepted" id="accepted" name="rp">
+                                <label for="accepted">Accepted</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-4 col-md-4 col-sm-5 col-xs-12 -->
+
+            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-12">
+                <div class="form-group">
+                    <input type="submit" id="submit-openjobs-filter" value="Submit" class="btn btn-default view-btn">
+                </div>
+            </div><!-- /col-lg-4 col-md-4 col-sm-2 col-xs-12 -->
+        </div><!-- /row -->
+
+
+        <div id="div-closedjob-filter" class="row" style="display:none;">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="form-group" style="padding-top:10px;">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" id="cleaning" class="radio-cleaning" name="cl">
+                                <label for="cleaning">Cleaning</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" id="meet" class="radio-meet" name="cl">
+                                <label for="meet">Meet/Greet</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            @*<input type="text" class="form-control" placeholder="Start Date" id="date" name="date">*@
+                            @Html.TextBoxFor(m => m.startDate, new { autocomplete = "off", placeholder = "Start Date", Name = "date", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            @*<input type="text" class="form-control" placeholder="End Date" id="date" name="date">*@
+                            @Html.TextBoxFor(m => m.endDate, new { autocomplete = "off", placeholder = "End Date", Name = "date", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <input type="submit" id="submit-closedjobs-filter" value="Submit" class="btn btn-default view-btn">
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+        </div><!-- /row -->
+
+        <div class="row flex-rows" id="div-cleaner-managejoblist">
+            @Html.Partial("~/Views/Cleaner/_pv_Cleaner_ManageJob_list.cshtml", Model)
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-cleaner-managejoblist-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.ManageJobsModelPagenation();
+                        model.cleanerId = Model.cleanerId;
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.jobStatus = ClassLibrary.Enum.JobStatus.fetchAll;
+                        model.workType = ClassLibrary.Enum.WorkType.All;
+                    }
+                    @Html.Partial("~/Views/Cleaner/_pv_Cleaner_ManageJob_list_Pagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+<br><br><br><br>
+
+<script>
+    $(document).ready(function () {
+        var date_input = $('input[name="date"]'); //our date input has the name "date"
+        var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+        date_input.datepicker({
+            format: 'dd/mm/yyyy',
+            container: container,
+            todayHighlight: true,
+            autoclose: true
+        })
+    })
+</script>
+
+
+
+
+
+<script>
+
+    $(document).on('click', '.radio-accepted', function () {
+        $('#jobStatus').val("Accepted");
+    });
+    $(document).on('click', '.radio-pending', function () {
+        $('#jobStatus').val("Pending");
+    });
+
+    $(document).on('click', '.radio-cleaning', function () {
+        $('#workType').val("Cleaning");
+    });
+    $(document).on('click', '.radio-meet', function () {
+        $('#workType').val("MeetORgreet");
+    });
+
+
+    $(document).on('change', '#slct-user-property', function () {
+        var propertyId = $(this).find(":selected").val();
+        $('#propertyId').val(parseInt(propertyId));
+    });
+
+
+    $(document).on('change', '#slct-user-property-completed', function () {
+        var propertyId = $(this).find(":selected").val();
+        $('#propertyId').val(parseInt(propertyId));
+    });
+
+    $(document).on('click', '#submit-openjobs-filter', function () {
+        var cleanerId = $('#cleanerId').val();
+        var value = $('#jobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = 0;
+        //obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        obj.jobStatus = value;
+
+        $.ajax({
+            url: '/Cleaner/RefreshManagejobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-managejoblist').html(data);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.jobStatus = value;
+
+
+                //newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManagejobsListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-managejoblist-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+
+    });
+
+    $(document).on('click', '#submit-closedjobs-filter', function () {
+        var cleanerId = $('#cleanerId').val();
+        var value = $('#jobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = 0;
+        //obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        obj.jobStatus = value;
+
+        $.ajax({
+            url: '/Cleaner/RefreshManagejobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-managejoblist').html(data);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.jobStatus = value;
+
+
+                //newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManagejobsListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-managejoblist-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+
+    });
+
+
+    $(document).on('click', '.a-user-managejobs', function () {
+        debugger;
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var value = $(this).attr('data-value');
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = 0;
+        if (value == "Completed")
+            obj.jobStatus = value;
+        else
+            obj.jobStatus = "fetchAll";
+        //$('#propertyId').val(0);
+        //$('#slct-user-property').val(0);
+        //$('#slct-user-property').text("Select my Property");
+        //$('#slct-user-property-completed').val(0);
+        //$('#slct-user-property-completed').text("Select my Property");
+        //obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        $('#workType').val("All");
+        obj.workType = $('#workType').val();
+
+        if ($(this).attr('data-value') == "Completed") {
+            $(document).find('#div-closedjob-filter').css('display', 'block');
+            $(document).find('#div-openjob-filter').css('display', 'none');
+        }
+        else {
+            $(document).find('#div-closedjob-filter').css('display', 'none');
+            $(document).find('#div-openjob-filter').css('display', 'block');
+        }
+
+        $.ajax({
+            url: '/Cleaner/RefreshManagejobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('.a-user-managejobs').removeClass('active');
+                $(source).addClass('active');
+                $('#div-cleaner-managejoblist').html(data);
+                $('#jobStatus').val(value);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.JobStatus = value;
+
+                if (value == "Completed")
+                    newobj.jobStatus = value;
+                else
+                    newobj.jobStatus = "";
+                //newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManagejobsListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-managejoblist-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+    });
+
+
+    $(document).on('click', '.a-cleaner-managejoblist-pageChange-next', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#jobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) + parseInt(1);
+        obj.jobStatus = value;
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        $.ajax({
+            url: '/Cleaner/RefreshManagejobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-managejoblist').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.jobStatus = value;
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/Cleaner/RefreshManagejobsListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-managejoblist-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+    });
+
+
+    $(document).on('click', '.a-cleaner-managejoblist-pageChange-prev', function () {
+
+        var source = $(this);
+        var cleanerId = $('#cleanerId').val();
+        var index = $('#index').val();
+        var value = $('#jobStatus').val();
+        var obj = new Object();
+        obj.cleanerId = cleanerId;
+        obj.index = parseInt(index) - parseInt(1);
+        obj.jobStatus = value;
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        $.ajax({
+            url: '/Cleaner/RefreshManagejobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-cleaner-managejoblist').html(data);
+
+                var newobj = new Object();
+                newobj.cleanerId = cleanerId;
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.jobStatus = value;
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+                $.ajax({
+                    url: '/Cleaner/RefreshManagejobsListPagenation',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-cleaner-managejoblist-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+
+
+</script>

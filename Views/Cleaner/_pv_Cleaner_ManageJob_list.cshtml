@@ -1,0 +1,68 @@
+﻿@model ClassLibrary.WebModels.ManageJobsModel
+@{
+    var jobList = new EntitiesLibrary.Data.WebService().ListAllJobs_Admin(Model).ToList();
+}
+
+@if (jobList.Count > 0)
+{
+    foreach (var job in jobList)
+    {
+        try
+        {
+            <div class="col-md-6 marg_btm">
+                <div class="job">
+                    <div class="job-header">
+                            @if (job.PROPERTYNAME != null && job.PROPERTYNAME != string.Empty)
+                            {
+                                <span>@job.PROPERTYNAME</span>
+                            }
+                            else
+                            {
+                                <span>&nbsp;</span>
+                            }
+
+                        <span class="pull-right">$@(job.PRICE.ToString() == "" ? "0" : String.Format("{0:#}", job.PRICE))</span>
+                        @try
+                        {
+                            <span class="pull-right">@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                            <span class="pull-right">@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                        }
+                        catch (Exception ex)
+                        {
+                            <span class="pull-right">@job.Date1.ToString("dd-MM-yyyy")</span>
+                            <span class="pull-right">@job.Date1.ToString("hh:mm tt")</span>
+                        }
+                    </div><!-- /job-header -->
+                    <div class="job-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="">
+                                    <img class="img-responsive" src="~/Content/images/icons/location.png" style="display: inline-block;" />
+                                    @*<h5 style="float:left;">
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                            <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)),
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                            <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                        </h5>*@
+                                    <span>
+                                        @((job == null ? "" : job.ADDRESS ?? string.Empty)),
+                                        @((job == null ? "" : job.SUBURB ?? string.Empty)) @((job == null ? "" : job.STATE ?? string.Empty)),
+                                        @((job == null ? "" : job.COUNTRY ?? string.Empty))
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="pull-right">@job.JobStatusString </span>
+                                <div class="job-btn">
+                                    <a href="/Cleaner/viewuserjobdetails/@job.JOBID.ToString()" class="view-btn">View</a>
+                                </div>
+                            </div>
+                        </div><!-- /row -->
+                    </div><!-- /job-body-->
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+        }
+        catch (Exception ex)
+        { }
+    }
+}

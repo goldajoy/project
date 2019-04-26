@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "home";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+
+<section class="main-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-banner">
+                    <img class="img-responsive" src="~/Content/images/slider1.jpg" />
+                    <div class="banner-caption">
+                        <h3>A homemade touch</h3>
+                        <p>Ready before your next guest arrives!</p>
+                    </div><!-- /banner-caption -->
+                </div><!-- /main-banner -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+
+<section class="serv-btn-sec">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="serv-btn">
+                    <a href="/Account/login?type=@((int)ClassLibrary.Enum.UserRole.User)">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-8 col-xs-7 col-md-offset-1  col-xs-offset-1">
+                                <p>I want a Cleaner</p>
+                                <h4>Post a Job</h4>
+                            </div>
+
+                            <div class="col-md-3 col-sm-4 col-xs-4">
+                                <img class="img-responsive" src="~/Content/images/icons/1.png" />
+                            </div>
+                        </div>
+                    </a>
+                </div><!-- /serv-btn -->
+
+                <div class="serv-btn">
+                    <a href="/Account/login?type=@((int)ClassLibrary.Enum.UserRole.Cleaner)">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-8 col-xs-7 col-md-offset-1  col-xs-offset-1">
+                                <p>I am a Cleaner</p>
+                                <h4>View Job</h4>
+                            </div>
+
+                            <div class="col-md-3 col-sm-4 col-xs-4">
+                                <img class="img-responsive" src="~/Content/images/icons/2.png" />
+                            </div>
+                        </div>
+                    </a>
+                </div><!-- /serv-btn -->
+
+                <div class="serv-btn">
+                    <a href="/Account/register">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-8 col-xs-7 col-md-offset-1  col-xs-offset-1">
+                                <p>I want to</p>
+                                <h4>Register</h4>
+                            </div>
+
+                            <div class="col-md-3 col-sm-4 col-xs-4">
+                                <img class="img-responsive" src="~/Content/images/icons/3.png" />
+                            </div>
+                        </div>
+                    </a>
+                </div><!-- /serv-btn -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+    </div><!-- /container -->
+</section>
+
+
+
+
+<section class="xtra-serv-sec">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-sm-6">
+                <div class="xtra-serv">
+                    <h2>Extra services</h2>
+                    <p>Airport pick up</p>
+                    <p>Laundry</p>
+                    <p>Essentials replenish – including beautiful hand made organic soaps and room sprays</p>
+                    <p>Meet and greet</p>
+                    <p>Management</p>
+                    <p>We help you reach Superhost Status! Learn the tricks of the trade to take your airbnb to the next level!</p>
+                </div><!-- /xtra-serv -->
+            </div><!-- /col-md-8 -->
+
+            <div class="col-md-4  col-sm-6">
+                <img class="img-responsive" src="~/Content/images/cleaner.jpg" />
+            </div>
+        </div><!-- /row -->
+    </div><!-- /container -->
+</section><!-- /xtra-serv-section -->

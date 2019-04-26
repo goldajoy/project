@@ -1,0 +1,254 @@
+﻿@model ClassLibrary.WebModels.CounterOfferDetailModel
+@{
+    ViewBag.Title = "counterofferdetail";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Convert.ToInt64(Model.jobId));
+}
+
+@if (job != null)
+{
+    if (job.CounterOffers.Count > 0)
+    {
+        var counterOffer = job.CounterOffers.Where(z => z.CounterOfferId == Model.counterOfferId).FirstOrDefault();
+        if (counterOffer != null)
+        {
+            <section class="inner-pages">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="innr-pg-ttle">
+                                My Jobs
+                            </div><!-- /innr-pg-ttle -->
+                        </div><!-- /col-md-12 -->
+                    </div><!-- /row -->
+
+                    <br>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="personal-details">
+                                <img src="~/Content/images/icons/personal-details.png" />
+                                <span>Cleaner Details</span>
+                            </div><!-- /personal-details -->
+
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="cleaner-details">
+                                        <div class="row">
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+                                                @if (counterOffer.CleanerDetails != null)
+                                                {
+                                                    if (counterOffer.CleanerDetails.ProfilePic != null && counterOffer.CleanerDetails.ProfilePic != string.Empty)
+                                                    {
+                                                        <img class="img-responsive img-rounded" src="@counterOffer.CleanerDetails.ProfilePic" width="80" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <img class="img-responsive img-rounded" src="/Content/images/user.png" width="80" />
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <img class="img-responsive img-rounded" src="/Content/images/user.png" width="80" />
+                                                }
+                                                <div class="rating">
+                                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+                                                <h4>@(counterOffer.CleanerDetails != null ? counterOffer.CleanerDetails.FirstName ?? string.Empty + " " + counterOffer.CleanerDetails.LastName ?? string.Empty : "")</h4>
+                                                <h4>&nbsp;</h4>
+                                                <h4>&nbsp;</h4>
+                                            </div>
+                                        </div><!-- /row -->
+                                    </div><!-- /cleaner-details -->
+                                </div><!-- /col-lg-12 col-md-12 col-sm-12 col-xs-12 -->
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="cleaner-details cleaner-details2">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <h4 class="text-right"><strong>First Quote :</strong></h4>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <h4 class="center-block text-center"><strong>$@(job.AdminPriceString ?? string.Empty)</strong></h4>
+                                            </div>
+                                        </div><!-- /row -->
+                                    </div><!-- /cleaner-details -->
+                                </div><!-- /col-lg-12 col-md-12 col-sm-12 col-xs-12 -->
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="cleaner-details cleaner-details2">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <h4 class="text-right"><strong>Counter Offer :</strong></h4>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <h4 class="center-block text-center"><strong>$@(counterOffer.Pricestring ?? string.Empty)</strong></h4>
+                                            </div>
+                                        </div><!-- /row -->
+                                    </div><!-- /cleaner-details -->
+                                </div><!-- /col-lg-12 col-md-12 col-sm-12 col-xs-12 -->
+                            </div><!-- /row -->
+
+                        </div><!-- /col-md-6 -->
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="personal-details">
+                                <img src="~/Content/images/icons/property-details.png" />
+                                <span>Property Details</span>
+                            </div><!-- /personal-details -->
+
+                            <div class="property-details">
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+                                        <h5><span>Property Type:</span> @((job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType ?? string.Empty))</h5>
+                                        <h5><span>Work Type:</span> @((job == null ? "" : job.WorkType ?? string.Empty))</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                                        <h5><span style="width:100%;">Property Description:</span></h5>
+                                        <h5>@((job.PropertyDetail == null ? "" : job.PropertyDetail.BedroomNumString ?? string.Empty)) Bedrooms</h5>
+                                        <h5>@((job.PropertyDetail == null ? "" : job.PropertyDetail.BathroomNumString ?? string.Empty)) Bathrooms</h5>
+                                    </div>
+                                </div><!-- /row -->
+                                <div class="row">
+                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                        <div class="property-details-imgs">
+                                            <img class="img-responsive" src="~/Content/images/icons/location.png" />
+                                            <h5 style="float:left;">
+                                                @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                                <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)),
+                                                @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                                <br>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                        <div class="property-details-imgs">
+                                            <img class="img-responsive" src="~/Content/images/icons/calendar-icon.png" />
+                                            @try
+                                            {
+                                                <h5 style="padding-top:5px;">@job.DatetoBrowser.ToString("dd-MM-yyyy")</h5>
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                <h5 style="padding-top:5px;">@job.Date1.ToString("dd-MM-yyyy")</h5>
+                                            }
+                                        </div>
+                                        <div class="property-details-imgs">
+                                            <img class="img-responsive" src="~/Content/images/icons/clock-icon.png" />
+                                            @try
+                                            {
+                                                <h5 style="padding-top:4px;">@job.DatetoBrowser.ToString("hh:mm tt")</h5>
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                <h5 style="padding-top:4px;">@job.Date1.ToString("hh:mm tt")</h5>
+                                            }
+                                        </div>
+                                    </div>
+                                </div><!-- /row -->
+                            </div><!-- /property-details -->
+                        </div><!-- /col-md-6 -->
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-3 col-lg-offset-3 col-md-3 col-md-offset-3 col-sm-3 col-sm-offset-3 col-xs-12">
+                                    <div class="form-pad"></div>
+                                    <input type="submit" value="Accept" class="pending-btn view-feedback-btn btn-user-counterOfferAccept" data-userid="@job.UserIdString" data-counterofferid="@counterOffer.CounterOfferIdstring" style="width:100%; margin-bottom:10px;" />
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <div class="form-pad hidden-xs"></div>
+                                    <input type="submit" value="Delete" class="pending-btn btn-user-counterOfferDelete" data-userid="@job.UserIdString" data-counterofferid="@counterOffer.CounterOfferIdstring"data-jobid="@counterOffer.JobIdstring" style="width:100%;" />
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /row -->
+
+                    <div class="spacing"></div>
+
+                    <br>
+                </div><!-- /container -->
+            </section><!-- /main-banner -->
+        }
+    }
+}
+
+<script>
+
+    $(document).on('click', '.btn-user-counterOfferAccept', function () {
+
+        var source = $(this);
+        var userId = $(source).attr('data-userid');
+        var counterOfferId = $(source).attr('data-counterofferid');
+        var obj = new Object();
+        obj.userId = userId;
+        obj.counterOfferId = counterOfferId;
+
+        $.ajax({
+            url: '/User/acceptCounterOffer',
+            type: "POST",
+            dataType: 'json',
+            data: obj,
+            success: function (data) {
+                if (data.Status) {
+                    toastr.success(data.Message);
+                    setTimeout(function () {
+                        window.location.href = "/User/myjobs";
+                    }, 300);
+                }
+                else {
+                    toastr.error(data.Message);
+                }
+            }
+        });
+
+    });
+
+
+
+    $(document).on('click', '.btn-user-counterOfferDelete', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var userId = $(source).attr('data-userid');
+            var counterOfferId = $(source).attr('data-counterofferid');
+            var jobId = $(source).attr('data-jobid');
+            var obj = new Object();
+            obj.userId = userId;
+            obj.counterOfferId = counterOfferId;
+            $.ajax({
+                url: '/User/userDeleteCounterOffer',
+                type: "POST",
+                dataType: 'json',
+                data: obj,
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            window.location.href = "/User/counteroffer/" + jobId;
+                        }, 300);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+</script>

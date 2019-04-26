@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "jobdetails";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Model.jobId);
+}
+
+
+<section class="inner-pages" style="pointer-events: none;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @if (job != null)
+                {
+                    if (job.PostedUserDetail != null)
+                    {
+                        <div class="innr-pg-ttle">
+                            @(job.PostedUserDetail.FirstName + " " + job.PostedUserDetail.LastName)
+                        </div><!-- /innr-pg-ttle -->
+                    }
+                    else
+                    {
+                        <div class="innr-pg-ttle">
+                            &nbsp;
+                        </div><!-- /innr-pg-ttle -->
+                    }
+                }
+                else
+                {
+                    <div class="innr-pg-ttle">
+                        &nbsp;
+                    </div><!-- /innr-pg-ttle -->
+                }
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pad1">
+                    <div class="col-md-6">
+                        <div class="personal-details">
+                            <img src="~/Content/images/icons/personal-details.png" />
+                            <span>Personal Details</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-6 -->
+
+                    <div class="col-md-5 col-md-offset-1">
+                        @*<input type="text" value="@(job != null ? job.JobStatus:"")" class="form-control pd-near" readonly />*@
+                        <select class="form-control pd-near" id="change-job-status-select">
+                            <option data-cleanerid="@(Data != null ? Data.UserId : "")" data-jobid="@(job != null ? job.JobIdString : "")" value="@ClassLibrary.Enum.JobStatus.Accepted.ToString()" @(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString() ? "selected" : "" : "")>Accepted</option>
+                            <option data-cleanerid="@(Data != null ? Data.UserId : "")" data-jobid="@(job != null ? job.JobIdString : "")" value="@ClassLibrary.Enum.JobStatus.Completed.ToString()" @(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString() ? "selected" : "" : "")>Completed</option>
+                        </select>
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+
+                <div class="job">
+                    <div class="job-header">
+                        <span class="col-md-4">@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))</span>
+                        @if (Data != null)
+                        {
+                            if (Data.IsAdmin)
+                            {
+
+                                <span class="pull-right text-right col-md-4">$@(job.PriceString == "" ? "0" : job.PriceString)</span>
+                            }
+                            else
+                            {
+                                <span class="pull-right text-right col-md-4">$@(job.AdminPriceString == "" ? "0" : job.AdminPriceString)</span>
+
+                            }
+                        }
+                    </div><!-- /job-header -->
+                    <div class="job-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span><i class="fa fa-phone"></i> @((job.PropertyDetail == null ? "" : job.PropertyDetail.Phone ?? string.Empty))</span>
+                            </div>
+                            <br><br>
+                            <div class="col-md-8">
+                                <!--<i class="fa fa-map-marker"></i>-->
+                                <img src="~/Content/images/icons/location.png" class="location-img" />
+                                <span>
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)) @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="~/Content/images/icons/calendar-icon.png" />
+                                <span>@*06-10-2017*@</span>
+                                @try
+                                {
+                                    <span>@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                                }
+                                catch (Exception ex)
+                                {
+                                    <span>@job.Date1.ToString("dd-MM-yyyy")</span>
+                                }
+                                <br>
+                                <img src="~/Content/images/icons/clock-icon.png" />
+                                @* <span>11:59 AM</span>*@
+                                @try
+                                {
+                                    <span>@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                                }
+                                catch (Exception ex)
+                                {
+                                    <span>@job.Date1.ToString("hh:mm tt")</span>
+                                }
+                            </div>
+                            @if (job != null)
+                            {
+                                if (job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString())
+                                {
+                                    <div class="col-md-12">
+                                        <div class="job-btn job-btn-center">
+                                            @if (Convert.ToBoolean(job.IsFeedbackGiven))
+                                            {
+                                                <a class="pending-btn view-feedback-btn" style="cursor: default;">View Feedback</a>
+                                            }
+                                            else
+                                            {
+                                                <a class="pending-btn" style="cursor: default;">Pending Feedback</a>
+                                            }
+                                        </div>
+                                    </div><!-- /col-md-12 -->
+                                }
+                            }
+                        </div><!-- /row -->
+                    </div><!-- /job-body-->
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+
+
+            <div class="col-md-6">
+                <div class="row pad1">
+                    <div class="col-md-6">
+                        <div class="personal-details">
+                            <img src="~/Content/images/icons/property-details.png" />
+                            <span>Property Details</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-6 -->
+
+                    <div class="col-md-5 col-md-offset-1">
+                    </div><!-- /col-md-5 -->
+                </div><!-- /row -->
+
+                <div class="job jd-detail">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><label>Property Type :</label> <span>@(job.PropertyDetail != null ? job.PropertyDetail.PropertyType : string.Empty)</span></h5>
+                            <h5><label>Work Type :</label> <span>@(job.WorkType ?? string.Empty)</span></h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Property Description</h5>
+                            <h5>
+                                <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BedroomNumString : string.Empty) Bedrooms</span>
+                                <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BathroomNumString : string.Empty) Bathrooms</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-12"><h5><span> @(job.PropertyDetail != null ? job.PropertyDetail.Description : string.Empty)</span></h5></div>
+                        <div class="col-md-12"><h5>Instructions : <span>@(job.Instructions ?? string.Empty)</span></h5></div>
+                    </div>
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>

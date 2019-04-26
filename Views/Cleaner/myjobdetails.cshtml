@@ -1,0 +1,624 @@
+﻿@{
+    ViewBag.Title = "myjobdetails";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Model.jobId);
+}
+
+
+<section class="inner-pages" style="@(job!=null?job.JobStatus==ClassLibrary.Enum.JobStatus.Completed.ToString()?"pointer-events: none;":"":"")">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @if (job != null)
+                {
+                    if (job.PostedUserDetail != null)
+                    {
+                        <div class="innr-pg-ttle">
+                            @(job.PostedUserDetail.FirstName + " " + job.PostedUserDetail.LastName)
+                        </div><!-- /innr-pg-ttle -->
+                    }
+                    else
+                    {
+                        <div class="innr-pg-ttle">
+                            &nbsp;
+                        </div><!-- /innr-pg-ttle -->
+                    }
+                }
+                else
+                {
+                    <div class="innr-pg-ttle">
+                        &nbsp;
+                    </div><!-- /innr-pg-ttle -->
+                }
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pad1">
+                    <div class="col-md-6">
+                        <div class="personal-details">
+                            <img src="~/Content/images/icons/personal-details.png" />
+                            <span>Personal Details</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-6 -->
+
+                    <div class="col-md-5 col-md-offset-1">
+                        @*<input type="text" value="@(job != null ? job.JobStatus:"")" class="form-control pd-near" readonly />*@
+                        <select class="form-control pd-near" id="change-job-status-select">
+                            <option data-cleanerid="@(Data != null ? Data.UserId : "")" data-jobid="@(job != null ? job.JobIdString : "")" value="@ClassLibrary.Enum.JobStatus.Accepted.ToString()" @(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString() ? "selected" : "" : "")>Accepted</option>
+                            <option data-cleanerid="@(Data != null ? Data.UserId : "")" data-jobid="@(job != null ? job.JobIdString : "")" value="@ClassLibrary.Enum.JobStatus.Completed.ToString()" @(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString() ? "selected" : "" : "")>Completed</option>
+                        </select>
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+
+                <div class="job">
+                    <div class="job-header">
+                        <span class="col-md-4">@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))</span>
+                        @if (Data != null)
+                        {
+                            if (Data.IsAdmin)
+                            {
+
+                                <span class="pull-right text-right col-md-4">$@(job.PriceString == "" ? "0" : job.PriceString)</span>
+                            }
+                            else
+                            {
+                                <span class="pull-right text-right col-md-4">$@(job.AdminPriceString == "" ? "0" : job.AdminPriceString)</span>
+
+                            }
+                        }
+                    </div><!-- /job-header -->
+                    <div class="job-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span><i class="fa fa-phone"></i> @((job.PropertyDetail == null ? "" : job.PropertyDetail.Phone ?? string.Empty))</span>
+                            </div>
+                            <br><br>
+                            <div class="col-md-8">
+                                <!--<i class="fa fa-map-marker"></i>-->
+                                <img src="~/Content/images/icons/location.png" class="location-img" />
+                                <span>
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty)),
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty)) @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty)),
+                                    @((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="~/Content/images/icons/calendar-icon.png" />
+                                <span>@*06-10-2017*@</span>
+                                @try
+                                {
+                                    <span>@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                                }
+                                catch (Exception ex)
+                                {
+                                    <span>@job.Date1.ToString("dd-MM-yyyy")</span>
+                                }
+                                <br>
+                                <img src="~/Content/images/icons/clock-icon.png" />
+                                @* <span>11:59 AM</span>*@
+                                @try
+                                {
+                                    <span>@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                                }
+                                catch (Exception ex)
+                                {
+                                    <span>@job.Date1.ToString("hh:mm tt")</span>
+                                }
+                            </div>
+                            @if (job != null)
+                            {
+                                if (job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString())
+                                {
+                                    <div class="col-md-12">
+                                        <div class="job-btn job-btn-center">
+                                            @if (Convert.ToBoolean(job.IsFeedbackGiven))
+                                            {
+                                                <a  class="pending-btn view-feedback-btn view-job-feedback" data-ratingvalue="@(job.feedback != null ? job.feedback.Ratingstring : "")" data-text="@(job.feedback != null ? job.feedback.Text : "")" style="cursor: pointer;pointer-events:all;">View Feedback</a>
+                                            }
+                                            else
+                                            {
+                                                <a class="pending-btn" style="cursor: default;">Pending Feedback</a>
+                                            }
+                                        </div>
+                                    </div><!-- /col-md-12 -->
+                                }
+                            }
+                        </div><!-- /row -->
+                    </div><!-- /job-body-->
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+
+
+            <div class="col-md-6">
+                <div class="row pad1">
+                    <div class="col-md-6">
+                        <div class="personal-details">
+                            <img src="~/Content/images/icons/property-details.png" />
+                            <span>Property Details</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-6 -->
+
+                    <div class="col-md-5 col-md-offset-1">
+                    </div><!-- /col-md-5 -->
+                </div><!-- /row -->
+
+                <div class="job jd-detail">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><label>Property Type :</label> <span>@(job.PropertyDetail != null ? job.PropertyDetail.PropertyType : string.Empty)</span></h5>
+                            <h5><label>Work Type :</label> <span>@(job.WorkType ?? string.Empty)</span></h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Property Description</h5>
+                            <h5>
+                                <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BedroomNumString : string.Empty) Bedrooms</span>
+                                <span class="full-width">@(job.PropertyDetail != null ? job.PropertyDetail.BathroomNumString : string.Empty) Bathrooms</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-12"><h5><span> @(job.PropertyDetail != null ? job.PropertyDetail.Description : string.Empty)</span></h5></div>
+                        <div class="col-md-12"><h5>Instructions : <span>@(job.Instructions ?? string.Empty)</span></h5></div>
+                    </div>
+                </div><!-- /job -->
+            </div><!-- /col-md-6 -->
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        @if (job != null)
+        {
+            if (job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString())
+            {
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="personal-details">
+                            <img src="~/Content/images/icons/personal-details.png" />
+                            <span>Personal Details</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-12 -->
+
+                    <div class="col-md-12">
+                        <ul class="prpty-images">
+                            @if (job != null)
+                            {
+                                if (job.PropertyDetail != null)
+                                {
+                                    int count = 0;
+                                    if (job.PropertyDetail.PropertyImagesFile.Count > 0)
+                                    {
+                                        foreach (var image in job.PropertyDetail.PropertyImagesFile)
+                                        {
+                                            <li><img style="width: 76px;height: 76px;" class="img-responsive" src="@image.Filepath" /></li>
+                                            count++;
+                                        }
+                                        for (int i = 0; i < 4 - count; i++)
+                                        {
+                                            <li><img style="width: 76px;height: 76px;" class="img-responsive" src="~/Content/images/add-images.png" /></li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int i = 0; i < 4 - count; i++)
+                                        {
+                                            <li><img style="width: 76px;height: 76px;" class="img-responsive" src="~/Content/images/add-images.png" /></li>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < 4; i++)
+                                    {
+                                        <li><img style="width: 76px;height: 76px;" class="img-responsive" src="~/Content/images/add-images.png" /></li>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    <li><img style="width: 76px;height: 76px;" class="img-responsive" src="~/Content/images/add-images.png" /></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div><!-- /row -->
+
+                <div class="spacing"></div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="personal-details-no-icon">
+                            <span>Check List</span>
+                        </div><!-- /personal-details -->
+                    </div><!-- /col-md-12 -->
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            @if (job != null)
+                            {
+                                if (job.ChecklistData.Count > 0)
+                                {
+                                    foreach (var data in job.ChecklistData)
+                                    {
+                                        if (data.Text != "Finishing")
+                                        {
+                                            <div class="col-md-4">
+                                                <div class="dtl-checkbox-list">
+                                                    <h4>@data.Text</h4>
+                                                    @if (data.Values.Count > 0)
+                                                    {
+                                                        foreach (var values in data.Values)
+                                                        {
+                                                            <div class="form-group">
+                                                                <input type="checkbox" data-optionid="@values.OptionId" data-optiontest="@values.OptionText" @(values.IsChecked == "true" ? "checked" : "") class="hidden-checkbox finalize-checkboxes" />
+                                                                <span class="checkbox-css @(values.IsChecked == "True" ? "active fa fa-check" : "")" id=" foo"></span>
+                                                                <span>@values.OptionText</span>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div><!-- /col-md-3 -->
+                                        }
+                                    }
+                                }
+                            }
+                            @*<div class="col-md-3">
+                                    <div class="dtl-checkbox-list">
+                                        <h4>Bedroom</h4>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Dust all surfaces</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Floor</span>
+                                        </div>
+                                    </div>
+                                </div><!-- /col-md-3 -->
+
+                                <div class="col-md-3">
+                                    <div class="dtl-checkbox-list">
+                                        <h4>Bathroom</h4>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Toilet</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Bathtub / Shower</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Floor</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Mirror / Windows</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Sink</span>
+                                        </div>
+                                    </div>
+                                </div><!-- /col-md-3 -->
+
+                                <div class="col-md-3">
+                                    <div class="dtl-checkbox-list">
+                                        <h4>Kitchen</h4>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Wipe all Surfaces</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean the Floor</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean Microwave</span>
+                                        </div>
+                                    </div>
+                                </div><!-- /col-md-3 -->
+
+                                <div class="col-md-3">
+                                    <div class="dtl-checkbox-list">
+                                        <h4>Bedroom</h4>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Wipe all Surfaces</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Clean the Floor</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" class="hidden-checkbox" />
+                                            <span class="checkbox-css" id="foo"></span>
+                                            <span>Dust Windows and mirrors</span>
+                                        </div>
+                                    </div>
+                                </div><!-- /col-md-3 -->*@
+                        </div><!-- /row -->
+                    </div>
+                </div><!-- /row -->
+
+                <div class="row">
+                    <hr />
+                    <div class="col-md-6 col-md-offset-3">
+                        <div class="dtl-checkbox-list">
+                            @if (job != null)
+                            {
+                                if (job.ChecklistData.Count > 0)
+                                {
+                                    foreach (var data in job.ChecklistData.Where(z => z.Text == "Finishing"))
+                                    {
+                                        <h4>@data.Text</h4>
+                                        if (data.Values.Count > 0)
+                                        {
+                                            foreach (var values in data.Values)
+                                            {
+                                                <div class="form-group">
+                                                    <input type="checkbox" data-optionid="@values.OptionId" data-optiontest="@values.OptionText" @(values.IsChecked == "true" ? "checked" : "") class="hidden-checkbox finalize-checkboxes" />
+                                                    <span class="checkbox-css @(values.IsChecked == "True" ? "active fa fa-check" : "")" id="foo"></span>
+                                                    <span>@values.OptionText</span>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            <textarea class="form-control" @(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString() ? "readonly" : "" : "") id="txt-cleaner-finalize-comment" placeholder="Comments" rows="3">@(job != null ? job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString() ? job.CleanerComment : "" : "")</textarea>
+                            <span style="color:red;display:none;" id="spn-job-finalize-comment">Required</span>
+                            @if (job != null)
+                            {
+                                if (job.JobStatus != ClassLibrary.Enum.JobStatus.Completed.ToString())
+                                {
+                                    <button class="btn btn-default finalize-btn" id="btn-finalize-job-cleaner" data-cleanerid="@(Data != null ? Data.UserId : "")" data-jobid="@(job != null ? job.JobIdString : "")">Finalise</button>
+                                    <a href="/Cleaner/myjobs" class="btn btn-default back-btn">Back</a>
+                                }
+                            }
+                        </div><!-- /dtl-checkbox-list -->
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+            }
+        }
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none;">
+                <button type="button" class="close popup-close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="font-weight: bold;">Rating and Comment</h4>
+            </div>
+            <div class="modal-body detail2-popup" style="pointer-events:none;">
+                <div class="form-group" style="text-align: center; font-size: 30px;">
+                    <div class="row" id="rating-div">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <textarea rows="3" id="txt-feedback" placeholder="Feedback" class="form-control"></textarea>
+                        @*<input type="text" id="txt-email" placeholder="email" class="form-control" />*@
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/Plugin/Rating/simple-rating.css" rel="stylesheet" />
+
+
+
+
+<!-- checkbox tick js -->
+<script>
+
+    $('.checkbox-css').click(function () {
+        $(this).toggleClass('active fa fa-check');
+
+        if ($(this).siblings('.hidden-checkbox').prop('checked')) {
+            $(this).siblings('.hidden-checkbox').prop('checked', false);
+        }
+        else { $(this).siblings('.hidden-checkbox').prop('checked', true); }
+    });
+
+
+    $(document).on('click', '#btn-finalize-job-cleaner', function () {
+
+        var source = $(this);
+        var status = true;
+        var checkBoxstatus = true;
+        $('.finalize-checkboxes').each(function () {
+            if ($(this).prop("checked") == false) {
+                checkBoxstatus = false;
+            }
+        });
+
+        var comment = $('#txt-cleaner-finalize-comment').val();
+        if (comment == "") {
+            status = false;
+            $('#spn-job-finalize-comment').css('display', 'block').show();
+        }
+        else {
+            $('#spn-job-finalize-comment').hide();
+        }
+
+        setTimeout(function () {
+            if (checkBoxstatus && status) {
+
+                var obj = new Object();
+                obj.CleanerId = $(source).attr('data-cleanerid');
+                obj.JobId = $(source).attr('data-jobid');
+                obj.Comment = comment
+                obj.IsFinalized = "true";
+                obj.Values = [];
+
+                $('.finalize-checkboxes').each(function () {
+                    var newObj = new Object();
+                    newObj.OptionText = $(this).attr('data-optiontest');
+                    newObj.OptionId = $(this).attr('data-optionid');
+                    newObj.IsChecked = "true";
+                    //console.log(newObj);
+                    obj.Values.push(newObj);
+                });
+                //console.log(obj.Values);
+                obj.ListValues = JSON.stringify(obj.Values);
+
+                setTimeout(function () {
+                    $.ajax({
+                        url: '/Cleaner/finalizejob',
+                        type: "POST",
+                        data: obj,
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.Status) {
+                                toastr.success("Job completed");
+                                setTimeout(function () {
+                                    window.location.href = "/Cleaner/myjobs";
+                                }, 300);
+                            }
+                            else {
+                                toastr.error(data.Message);
+                            }
+                        }
+                    });
+
+                }, 1000);
+            }
+            else {
+                if (checkBoxstatus == false)
+                    toastr.error("Pls tick all the checkbox");
+            }
+        }, 250);
+    });
+
+
+    $(document).on('change', '#change-job-status-select', function () {
+
+        var source = $(this);
+        var selectValue = $("#change-job-status-select option:selected").val();
+        if (selectValue == "Completed") {
+            var status = true;
+            var checkBoxstatus = true;
+            $('.finalize-checkboxes').each(function () {
+                if ($(this).prop("checked") == false) {
+                    checkBoxstatus = false;
+                }
+            });
+
+            var comment = $('#txt-cleaner-finalize-comment').val();
+            if (comment == "") {
+                status = false;
+                $('#spn-job-finalize-comment').css('display', 'block').show();
+            }
+            else {
+                $('#spn-job-finalize-comment').hide();
+            }
+
+            setTimeout(function () {
+                if (checkBoxstatus && status) {
+
+                    var obj = new Object();
+                    obj.CleanerId = $('#change-job-status-select option:selected').attr('data-cleanerid');
+                    obj.JobId = $('#change-job-status-select option:selected').attr('data-jobid');
+                    obj.Comment = comment
+                    obj.IsFinalized = "true";
+                    obj.Values = [];
+                    //console.log(obj)
+                    $('.finalize-checkboxes').each(function () {
+                        var newObj = new Object();
+                        newObj.OptionText = $(this).attr('data-optiontest');
+                        newObj.OptionId = $(this).attr('data-optionid');
+                        newObj.IsChecked = "true";
+                        //console.log(newObj);
+                        obj.Values.push(newObj);
+                    });
+                    //console.log(obj.Values);
+                    obj.ListValues = JSON.stringify(obj.Values);
+
+                    setTimeout(function () {
+                        $.ajax({
+                            url: '/Cleaner/finalizejob',
+                            type: "POST",
+                            data: obj,
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.Status) {
+                                    toastr.success("Job completed");
+                                    setTimeout(function () {
+                                        window.location.href = "/Cleaner/myjobs";
+                                    }, 300);
+                                }
+                                else {
+                                    toastr.error(data.Message);
+                                }
+                            }
+                        });
+
+                    }, 1000);
+                }
+                else {
+                    if (checkBoxstatus == false)
+                        toastr.error("Pls tick all the checkbox");
+                    $('#change-job-status-select option:selected').attr("selected", null);
+                    $('#change-job-status-select option[value="Accepted"]').attr("selected", "selected");
+                    $('#change-job-status-select').val("Accepted");
+                }
+            }, 250);
+        }
+        else {
+        }
+    });
+
+
+    $(document).on('click', '.view-job-feedback', function () {
+        var source = $(this);
+        var ratingValue = $(this).attr('data-ratingvalue');
+        var ratingText = $(this).attr('data-text');
+        //$('#rating-value').val(ratingValue);
+        var appendString = "";
+        for (i = 0; i < parseInt(ratingValue) ; i++) {
+            appendString = appendString + '<i class="fa fa-star" style="color: #f5ba00;margin-left: 1px;"></i>'
+        }
+        for (i = parseInt(ratingValue) ; i < 5  ; i++) {
+            appendString = appendString + '<i class="fa fa-star-o" style="color: #f5ba00;margin-left: 1px;"></i>'
+        }
+
+        $('#txt-feedback').val(ratingText);
+        $('#rating-div').html(appendString);
+        //$('.rating').rating();
+        $('#myModal').modal('show');
+    });
+
+</script>

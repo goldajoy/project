@@ -1,0 +1,248 @@
+﻿@model ClassLibrary.WebModels.SettingsModel
+@{
+    ViewBag.Title = "settings";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+<input type="hidden" id="hfn-pushstatus" value="@Model.Status" />
+<input type="hidden" id="hfn-id" value="@Model.Id" />
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle text-center">
+                    Settings
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="notification">
+                    <h4>Notification Settings</h4>
+                    <!--<div class="form-group">
+                        <span>Push notifications: </span>
+                        <div>
+                            <label class="switch">
+                              <input type="checkbox">
+                              <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>-->
+
+                    <div class="row">
+                        <div class="col-md-5 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-5 col-xs-offset-0">
+                            <span class="text-right pull-right sett_span">Push notifications: </span>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="form-group">
+                                <label class="switch" id="lbl-notification-switch">
+                                    <input type="checkbox" id="lbl-notification-checkbox" @(Model.Status == "True" ? "checked" : "")>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="row">
+                        <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-5 col-xs-offset-0">
+                            <span class="text-right pull-right sett_span">Job reminder before (hour): </span>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control job_reminder" id="user-job-reminder" value="@(Data!=null?Data.JobReminder:"")" />
+                                <span id="spn-jobreminder" style="color:red;display:none;"></span>
+                                <input type="submit" id="btn-job-reminder" class="btn btn-default set_btn" value="Set" />
+                            </div>
+                        </div>
+                    </div>*@
+                </div><!-- ./notification -->
+
+                <div class="settings">
+                    <h4>Change Settings</h4>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-5 col-xs-offset-0">
+                            <span class="text-right pull-right sett_span">Current Password:</span>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="txt-currentpassword" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-5 col-xs-offset-0">
+                            <span class="text-right pull-right sett_span">New Password:</span>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="txt-newpassword" />
+                                <span id="spn-currentpassword" style="color:red;display:none;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-5 col-xs-offset-0">
+                            <span class="text-right pull-right sett_span">Confirm Password:</span>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="txt-confirmpassword" />
+                                <span id="spn-confirmpassword" style="color:red;display:none;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="form-pad"></div>
+                            <input type="submit" value="Submit" id="btn-changepassword" class="btn btn-default view-job-btn view-btn" style="width:100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+
+<br><br><br><br>
+
+
+<script>
+
+    $(document).on('change', '#lbl-notification-switch', function () {
+
+        var status = $('#lbl-notification-checkbox').prop('checked');
+        var id = $('#hfn-id').val();
+        var newobj = new Object();
+        newobj.Id = id;
+        newobj.Status = status;
+        $.ajax({
+            url: '/User/RefreshPushStatus',
+            type: "POST",
+            data: newobj,
+            dataType: 'json',
+            success: function (result) {
+                if (result.Status) {
+                    toastr.success("Push notification updated");
+                }
+                else {
+                    toastr.error("An error has occured");
+                }
+
+            }
+        });
+
+
+
+    });
+
+
+    $(document).on('click', '#btn-changepassword', function () {
+        var status = true;
+        var currentPassword = $('#txt-currentpassword').val();
+        var newPassword = $('#txt-newpassword').val();
+        var confirmPassword = $('#txt-confirmpassword').val();
+
+
+        if (confirmPassword == newPassword || newPassword == "" || confirmPassword == "") {
+            $('#spn-confirmpassword').hide();
+            $('#txt-confirmpassword').css('border-color', '#000')
+        }
+        else {
+            status = false;
+            $('#spn-confirmpassword').text("Password don't match").show();
+            $('#txt-confirmpassword').css('border-color', 'red')
+        }
+
+        if (currentPassword != newPassword || newPassword == "" || currentPassword == "") {
+            $('#spn-currentpassword').hide();
+            $('#txt-currentpassword').css('border-color', '#000')
+            $('#txt-newpassword').css('border-color', '#000')
+        }
+        else {
+            status = false;
+            $('#spn-currentpassword').text("New password can't be same as current password").show();
+            $('#txt-currentpassword').css('border-color', 'red')
+            $('#txt-newpassword').css('border-color', 'red')
+        }
+
+        if (currentPassword != "" && currentPassword != null) {
+            $('#txt-currentpassword').css('border-color', '#000')
+        }
+        else {
+            status = false;
+            $('#txt-currentpassword').css('border-color', 'red')
+        }
+
+        if (newPassword != "" && newPassword != null) {
+            $('#txt-newpassword').css('border-color', '#000')
+        }
+        else {
+            status = false;
+            $('#txt-newpassword').css('border-color', 'red')
+        }
+
+        if (confirmPassword != "" && confirmPassword != null) {
+            $('#txt-confirmpassword').css('border-color', '#000')
+        }
+        else {
+            status = false;
+            $('#txt-confirmpassword').css('border-color', 'red')
+        }
+
+       
+
+        if (status) {
+            var id = $('#hfn-id').val();
+            var newobj = new Object();
+            newobj.Id = id;
+            newobj.CurrentPassword = currentPassword;
+            newobj.NewPassword = newPassword;
+            $.ajax({
+                url: '/User/changePassword',
+                type: "POST",
+                data: newobj,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.Status) {
+                        toastr.success("Password changed");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 500);
+                    }
+                    else {
+                        toastr.error(result.Message);
+                    }
+
+                }
+            });
+        }
+
+
+    });
+
+
+    $(document).on('keydown', "#user-job-reminder", function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+</script>

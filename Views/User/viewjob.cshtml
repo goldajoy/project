@@ -1,0 +1,572 @@
+﻿@model ClassLibrary.WebModels.UserViewJobModel
+@{
+    ViewBag.Title = "viewjob";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Model.jobId);
+}
+
+<style>
+    /*.view-btn:hover,.editjob-btn:hover {
+        color: #f4f4f4;
+    }*/
+</style>
+<input type="hidden" id="hfn-cleanerId" value="@(job!=null?job.AcceptedCleanerDetail!=null?job.AcceptedCleanerDetail.UserId:"":"")" />
+<input type="hidden" id="hfn-jobId" value="@(job!=null?job.JobIdString:"")" />
+@if (job != null)
+{
+    <section class="inner-pages">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="innr-pg-ttle">
+                        My Jobs
+                    </div><!-- /innr-pg-ttle -->
+                </div><!-- /col-md-12 -->
+            </div><!-- /row -->
+
+            <br>
+
+
+
+
+
+            @if (job.SelectedCleanerId != 0)
+            {
+                <div class="row">
+
+                    @if (job.SelectedCleanerDetails.Count > 0)
+                    {
+                        var cleanerData = job.SelectedCleanerDetails.FirstOrDefault();
+
+                        if (job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString())
+                        {
+                            <div class="col-md-6">
+                                <div class="row pad1">
+                                    <div class="col-md-6">
+                                        <div class="personal-details">
+                                            <img src="~/Content/images/icons/personal-details.png" />
+                                            <span>Cleaner Details</span>
+                                        </div><!-- /personal-details -->
+                                    </div><!-- /col-md-6 -->
+                                </div><!-- /row -->
+
+
+
+                                <div class="job new_job">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+                                            <img class="img-responsive img-rounded" src="~/Content/images/user.png" width="80">
+                                            <div class="rating">
+                                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+                                            <h4>@cleanerData.FIRSTNAME @cleanerData.LASTNAME</h4><br>
+                                            <h4>@cleanerData.EMAIL</h4><br>
+                                            <h4><i class="fa fa-phone"></i> @cleanerData.PHONE</h4>
+                                        </div>
+                                    </div>
+                                </div><!-- /job -->
+
+                            </div><!-- /col-md-6 -->
+                        }
+                        else
+                        {
+                            <div class="col-md-6">
+                                <div class="row pad1">
+                                    <div class="col-md-6">
+                                        <div class="personal-details">
+                                            <img src="~/Content/images/icons/personal-details.png" />
+                                            <span>Cleaner Details</span>
+                                        </div><!-- /personal-details -->
+                                    </div><!-- /col-md-6 -->
+                                </div><!-- /row -->
+
+                                <div class="job new_job">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+                                            <img class="img-responsive img-rounded" id="img-pic" src="@cleanerData.PROFILEIMAGE" width="80">
+                                        </div>
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+                                            <h4 id="h4-cleanername">@cleanerData.FIRSTNAME @cleanerData.LASTNAME</h4><br>
+                                            <h4 class="pull-right">Not Accepted</h4><br>
+                                            <h4><i class="fa fa-phone"></i><label id="lbl-phone"> @cleanerData.PHONE </label></h4>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="clnr-dtls">
+                                                <div class="form-group">
+                                                    <select class="form-control" id="slct-changeselctedcleaner-job">
+                                                        <option value="0" data-cleanerid=" 0">Please select</option>
+                                                        @{
+                            var cleanerList = new EntitiesLibrary.Data.WebService().fetchUserSelectedCleaners(Model.userId).ToList();
+                            if (cleanerList.Count > 0)
+                            {
+                                foreach (var item in cleanerList)
+                                {
+                                    if (item.CLEANERID != cleanerData.CLEANERID)
+                                    {
+                                        <option value="@item.CLEANERID" data-cleanerid="@item.CLEANERID" data-phone="@item.PHONE" data-pic="@item.PROFILEIMAGE">@item.FIRSTNAME @item.LASTNAME</option>
+                                    }
+                                }
+                            }
+                                                        }
+                                                    </select>
+                                                </div>
+
+                                                <button class="btn btn-default finalize-btn" id="btn-change-cleaner">Resend</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /col-md-6 -->
+                        }
+
+
+
+                    }
+
+
+                    <div class="col-md-6">
+                        <div class="row pad1">
+                            <div class="col-md-6">
+                                <div class="personal-details">
+                                    <img src="~/Content/images/icons/personal-details.png" />
+                                    <span>Personal Details</span>
+                                </div><!-- /personal-details -->
+                            </div><!-- /col-md-6 -->
+
+                            <div class="col-md-5 col-md-offset-1">
+                                @*@if (job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString())
+                                    {
+                                    }*@
+                                <input type="text" class="form-control pd-near" value="@job.JobStatus" readonly />
+                                @*<select class="form-control pd-near">
+                                        <option>Accepted</option>
+                                    </select>*@
+                            </div><!-- /col-md-6 -->
+                        </div><!-- /row -->
+
+                        <div class="job">
+                            <div class="job-header">
+                                <span class="col-md-4">@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))</span>
+                                <span class="pull-right text-right col-md-4">$@(job.PriceString == "" ? "0" : job.PriceString)</span>
+                            </div><!-- /job-header -->
+                            <div class="job-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span><i class="fa fa-phone"></i> @((job.PropertyDetail == null ? "" : job.PropertyDetail.Phone ?? string.Empty))</span>
+                                    </div>
+                                    <br><br>
+                                    <div class="col-md-8">
+                                        <!--<i class="fa fa-map-marker"></i>-->
+                                        <img src="~/Content/images/icons/location.png" class="location-img" />
+                                        <span>
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty))
+                                            , @((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty))
+                                            , @((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                        </span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <img src="~/Content/images/icons/calendar-icon.png" />
+                                        @try
+                                        {
+                                            <span>@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <span>@job.Date1.ToString("dd-MM-yyyy")</span>
+                                        }
+                                        <br>
+                                        <img src="~/Content/images/icons/clock-icon.png" />
+                                        @try
+                                        {
+                                            <span>@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <span>@job.Date1.ToString("hh:mm tt")</span>
+                                        }
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="job-btn job-btn-center">
+                                            @if (job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString())
+                                            {
+                                                if (!Convert.ToBoolean(job.IsFeedbackGiven))
+                                                {
+                                                    <a style="cursor:pointer;" data-toggle="modal" data-target="#myModal" class="pending-btn">Pending Feedback</a>
+                                                }
+                                            }
+                                        </div>
+                                    </div><!-- /col-md-12 -->
+                                </div><!-- /row -->
+                            </div><!-- /job-body-->
+                        </div><!-- /job -->
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+
+                <div class="spacing"></div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row pad1">
+                            <div class="col-md-6">
+                                <div class="personal-details">
+                                    <img src="~/Content/images/icons/property-details.png" />
+                                    <span>Property Details</span>
+                                </div><!-- /personal-details -->
+                            </div><!-- /col-md-6 -->
+
+                            <div class="col-md-5 col-md-offset-1">
+                            </div><!-- /col-md-5 -->
+                        </div><!-- /row -->
+
+                        <div class="job jd-detail">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><label>Property Type :</label> <span>@((job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType ?? string.Empty))</span></h5>
+                                    <h5><label>Work Type : </label><span>@((job == null ? "" : job.WorkType ?? string.Empty))</span></h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Property Description</h5>
+                                    <h5>
+                                        <span class="full-width">@((job.PropertyDetail == null ? "" : job.PropertyDetail.BedroomNumString ?? string.Empty)) Bedrooms</span>
+                                        <span class="full-width">@((job.PropertyDetail == null ? "" : job.PropertyDetail.BathroomNumString ?? string.Empty)) Bathrooms</span>
+                                    </h5>
+                                </div>
+                                <div class="col-md-12"><h5><span>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Description ?? string.Empty))</span></h5></div>
+                                <div class="col-md-12"><h5>Instructions : <span>@((job == null ? "" : job.Instructions ?? string.Empty))</span></h5></div>
+                            </div>
+                        </div><!-- /job -->
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row pad1">
+                            <div class="col-md-6">
+                                <div class="personal-details">
+                                    <img src="~/Content/images/icons/personal-details.png" />
+                                    <span>Personal Details</span>
+                                </div><!-- /personal-details -->
+                            </div><!-- /col-md-6 -->
+
+                            <div class="col-md-5 col-md-offset-1">
+                                @*@if (job.JobStatus == ClassLibrary.Enum.JobStatus.Accepted.ToString())
+                                    {
+                                    }*@
+                                <input type="text" class="form-control pd-near" value="@job.JobStatus" readonly />
+                                @*<select class="form-control pd-near">
+                                        <option>Accepted</option>
+                                    </select>*@
+                            </div><!-- /col-md-6 -->
+                        </div><!-- /row -->
+
+                        <div class="job">
+                            <div class="job-header">
+                                <span class="col-md-4">@((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))</span>
+                                <span class="pull-right text-right col-md-4">$@(job.PriceString == "" ? "0" : job.PriceString)</span>
+                            </div><!-- /job-header -->
+                            <div class="job-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span><i class="fa fa-phone"></i> @((job.PropertyDetail == null ? "" : job.PropertyDetail.Phone ?? string.Empty))</span>
+                                    </div>
+                                    <br><br>
+                                    <div class="col-md-8">
+                                        <!--<i class="fa fa-map-marker"></i>-->
+                                        <img src="~/Content/images/icons/location.png" class="location-img" />
+                                        <span>
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty))
+                                            , @((job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty))
+                                            @((job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty))
+                                            , @((job.PropertyDetail == null ? "" : job.PropertyDetail.Country ?? string.Empty))
+                                        </span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <img src="~/Content/images/icons/calendar-icon.png" />
+                                        @try
+                                        {
+                                            <span>@job.DatetoBrowser.ToString("dd-MM-yyyy")</span>
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <span>@job.Date1.ToString("dd-MM-yyyy")</span>
+                                        }
+                                        <br>
+                                        <img src="~/Content/images/icons/clock-icon.png" />
+                                        @try
+                                        {
+                                            <span>@job.DatetoBrowser.ToString("hh:mm tt")</span>
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            <span>@job.Date1.ToString("hh:mm tt")</span>
+                                        }
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="job-btn job-btn-center">
+                                            @if (job.JobStatus == ClassLibrary.Enum.JobStatus.Completed.ToString())
+                                            {
+                                                if (!Convert.ToBoolean(job.IsFeedbackGiven))
+                                                {
+                                                    <a style="cursor:pointer;" data-toggle="modal" data-target="#myModal" class="pending-btn">Pending Feedback</a>
+                                                }
+                                            }
+                                        </div>
+                                    </div><!-- /col-md-12 -->
+                                </div><!-- /row -->
+                            </div><!-- /job-body-->
+                        </div><!-- /job -->
+                    </div><!-- /col-md-6 -->
+
+
+
+                    <div class="col-md-6">
+                        <div class="row pad1">
+                            <div class="col-md-6">
+                                <div class="personal-details">
+                                    <img src="~/Content/images/icons/property-details.png" />
+                                    <span>Property Details</span>
+                                </div><!-- /personal-details -->
+                            </div><!-- /col-md-6 -->
+
+                            <div class="col-md-5 col-md-offset-1">
+                            </div><!-- /col-md-5 -->
+                        </div><!-- /row -->
+
+                        <div class="job jd-detail">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><label>Property Type :</label> <span>@((job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType ?? string.Empty))</span></h5>
+                                    <h5><label>Work Type : </label><span>@((job == null ? "" : job.WorkType ?? string.Empty))</span></h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Property Description</h5>
+                                    <h5>
+                                        <span class="full-width">@((job.PropertyDetail == null ? "" : job.PropertyDetail.BedroomNumString ?? string.Empty)) Bedrooms</span>
+                                        <span class="full-width">@((job.PropertyDetail == null ? "" : job.PropertyDetail.BathroomNumString ?? string.Empty)) Bathrooms</span>
+                                    </h5>
+                                </div>
+                                <div class="col-md-12"><h5><span>@((job.PropertyDetail == null ? "" : job.PropertyDetail.Description ?? string.Empty))</span></h5></div>
+                                <div class="col-md-12"><h5>Instructions : <span>@((job == null ? "" : job.Instructions ?? string.Empty))</span></h5></div>
+                            </div>
+                        </div><!-- /job -->
+                    </div><!-- /col-md-6 -->
+                </div><!-- /row -->
+            }
+
+
+            @if (job != null)
+            {
+                if (job.JobStatus == ClassLibrary.Enum.JobStatus.Pending.ToString())
+                {
+                    <div class="row" style="padding-top: 10px;">
+                        <div class="col-lg-6 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-4 col-xs-12 col-xs-offset-0">
+                            <a href="/User/editjob/@job.JobIdString" class="btn btn-default view-job-btn view-btn" style="float: left; width: 200px; margin-right:5px;">Edit</a>
+                            <a class="btn btn-default view-job-btn pending-btn user-delete-job" data-jobid="@job.JobIdString" style="float:left; width:200px; ">Delete</a>
+                        </div>
+                    </div>
+                }
+            }
+
+
+            <div class="spacing"></div>
+
+        </div><!-- /container -->
+    </section><!-- /main-banner -->
+
+
+    <br><br><br><br>
+}
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none;">
+                <button type="button" class="close popup-close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" style="font-weight: bold;">Rating and Comment</h4>
+            </div>
+            <div class="modal-body detail2-popup">
+                <div class="form-group" style="text-align: center; font-size: 30px;">
+                    <div class="row">
+                        <input class="rating" id="rating-value">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <textarea rows="3" id="txt-feedback" placeholder="Feedback" class="form-control"></textarea>
+                        @*<input type="text" id="txt-email" placeholder="email" class="form-control" />*@
+                        <span id="spn-txt-feedback" style="display:none;color:red"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-default popup-btn center-block" id="btn-submit-feedback">submit</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<link href="~/Content/Plugin/Rating/simple-rating.css" rel="stylesheet" />
+<script src="~/Content/Plugin/Rating/simple-rating.js"></script>
+
+<script>
+
+    $(document).on('click', '.user-delete-job', function () {
+
+        var source = $(this);
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#004b8d",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: true
+        },
+        function () {
+            var jobId = $(source).attr('data-jobId');
+            $.ajax({
+                url: '/User/removeJob/' + jobId,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            window.location.href = "/User/myjobs";
+                        }, 300);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+
+        });
+
+    });
+
+
+    $(document).ready(function () {
+        $('.rating').rating();
+    });
+
+    $(document).on('click', '#btn-submit-feedback', function () {
+        var status = true;
+        var feedback = $('#txt-feedback').val();
+        var cleanerId = $('#hfn-cleanerId').val();
+        var jobId = $('#hfn-jobId').val();
+        if (feedback != "" && feedback != null) {
+            $('#spn-txt-feedback').hide();
+        }
+        else {
+            $('#spn-txt-feedback').text("Required").show();
+            status = false;
+        }
+
+        var ratingValue = $('#rating-value').val();
+        if (ratingValue == "" || ratingValue == null) {
+            status = false;
+            toastr.error('pls provide a rating');
+        }
+
+        if (status) {
+            var obj = new Object();
+            obj.CleanerId = cleanerId;
+            obj.JobId = jobId;
+            obj.Text = feedback;
+            obj.Rating = ratingValue;
+            $.ajax({
+                url: '/User/submitjobfeedback',
+                type: "POST",
+                data: obj,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        toastr.success(data.Message);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 300);
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+        }
+
+    });
+
+</script>
+<script>
+
+
+    $('#slct-changeselctedcleaner-job').on('change', function () {
+        var source = $(this);
+        var cleanerId = $("#slct-changeselctedcleaner-job option:selected").attr('data-cleanerid');
+        var phone = $("#slct-changeselctedcleaner-job option:selected").attr('data-phone');
+        var pic = $("#slct-changeselctedcleaner-job option:selected").attr('data-pic');
+        var cleanerName = $("#slct-changeselctedcleaner-job option:selected").text();
+        if (cleanerId == 0) {
+            $('#lbl-phone').text(' Phone');
+            $('#h4-cleanername').text('Name');
+            $('#img-pic').attr("src", "/Content/images/icons/profile-icon.png");
+            //$('#btn-change-cleaner').prop('disabled', true);
+        }
+        else {
+            $('#lbl-phone').text(' ' + phone);
+            $('#h4-cleanername').text(cleanerName);
+            $('#img-pic').attr("src", pic);
+            //$('#btn-change-cleaner').prop('disabled', false);
+        }
+    });
+
+    $(document).on('click', '#btn-change-cleaner', function () {
+        var cleanerId = $("#slct-changeselctedcleaner-job option:selected").attr('data-cleanerid');
+        var phone = $("#slct-changeselctedcleaner-job option:selected").attr('data-phone');
+        var pic = $("#slct-changeselctedcleaner-job option:selected").attr('data-pic');
+        var cleanerName = $("#slct-changeselctedcleaner-job option:selected").text();
+        if (cleanerId != 0) {
+            var jobId = $('#hfn-jobId').val();
+            var newobj = new Object();
+            newobj.jobId = parseInt(jobId);
+            newobj.NextCleanerId = cleanerId;
+
+            $.ajax({
+                url: '/User/changeSelectedCleaner',
+                type: "POST",
+                data: newobj,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Status) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 250);
+                        toastr.success("Cleaner updated");
+                    }
+                    else {
+                        toastr.error(data.Message);
+                    }
+                }
+            });
+        }
+    });
+
+
+
+
+
+</script>

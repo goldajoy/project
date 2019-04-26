@@ -1,0 +1,842 @@
+﻿@model ClassLibrary.WebModels.EditJobAdmin
+@{
+    ViewBag.Title = "editjob";
+    Layout = "~/Views/Shared/_CleanerLayout.cshtml";
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+    var job = new EntitiesLibrary.Data.Job(Convert.ToInt64(Model.JobId));
+    Model.Property = new ClassLibrary.WebModels.EditUserPropertyModel();
+    Model.UserId = "0";
+    if (job != null)
+    {
+        Model.PropertyId = Convert.ToString(job.PropertyId);
+        if (job.PropertyDetail != null)
+        {
+            Model.Property.Description = job.PropertyDetail.Description ?? string.Empty;
+        }
+        Model.Instructions = job.Instructions ?? string.Empty;
+        Model.UserId = Convert.ToString(job.UserId);
+    }
+}
+
+
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    Edit Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <br>
+
+        <div class="row">
+            @using (Ajax.BeginForm("editjob", "Cleaner", null, new AjaxOptions
+        {
+            HttpMethod = "POST",
+            OnSuccess = "editjobSuccess",
+            OnFailure = "ajaxFailure",
+        }, new { id = "user-edit-job-form" }))
+            {
+                @Html.HiddenFor(m => m.PropertyString)
+                @Html.HiddenFor(m => m.Property.Latitude)
+                @Html.HiddenFor(m => m.IsNewProperty, new { Value = "false" })
+                @Html.HiddenFor(m => m.Property.Longitude)
+                @Html.HiddenFor(m => m.WorkType, new { Value = (job == null ? "0" : job.WorkType) })
+                @Html.HiddenFor(m => m.Property.JobType, new { Value = (job == null ? "0" : job.PropertyDetail == null ? "0" : job.PropertyDetail.JobType) })
+                @Html.HiddenFor(m => m.Property.PropertyType, new { Value = (job == null ? "0" : job.PropertyDetail == null ? "0" : job.PropertyDetail.PropertyType) })
+                @Html.HiddenFor(m => m.cleanerId, new { Value = Model.cleanerId })
+                @Html.HiddenFor(m => m.UserId, new { Value = Model.UserId })
+                @Html.HiddenFor(m => m.PropertyId, new { Value = Model.PropertyId })
+                @Html.HiddenFor(m => m.JobId, new { Value = Model.JobId })
+                @Html.HiddenFor(m => m.TimeZone, new { Value = "UTC" })
+                @Html.HiddenFor(m => m.hasMadeAnyChange, new { Value = false })
+                @Html.HiddenFor(m => m.CurrentCleanerId, new { Value = (job == null ? "0" : job.SelectedCleanerId.ToString()) })
+                @Html.HiddenFor(m => m.NextCleanerId, new { Value = (job == null ? "0" : job.SelectedCleanerId.ToString()) })
+                <div class="col-md-4">
+                    <div class="personal-details">
+                        <img src="~/Content/images/icons/post-job.png" />
+                        <span>Edit a job</span>
+                    </div><!-- /personal-details -->
+
+                    <div class="form-group">
+                        <select class="form-control" id="slct-user-property">
+                            <option value="0">Select my Property</option>
+                            @if (Data != null)
+                            {
+                                if (Data.UserProperties.Count > 0)
+                                {
+                                    foreach (var property in Data.UserProperties)
+                                    {
+                                        <option @((job == null ? "" : job.PropertyIdString == property.PropertyId ? "selected" : "")) value="@property.PropertyId">@(property.PropertyName ?? string.Empty)</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="radio" name="sp" value="@ClassLibrary.Enum.JobType.Business" class="radio-jobtype" id="radio-jobtype-Business" @((job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.JobType == ClassLibrary.Enum.JobType.Business.ToString() ? "checked" : "")) />
+                                <label for="radio-jobtype-Business">Business</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="radio" name="sp" value="@ClassLibrary.Enum.JobType.Residential" class="radio-jobtype" id="radio-jobtype-Residential" @((job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.JobType == ClassLibrary.Enum.JobType.Residential.ToString() ? "checked" : "")) />
+                                <label for="radio-jobtype-Residential">Residential</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="radio" name="sp1" value="@ClassLibrary.Enum.WorkType.Cleaning" class="radio-worktype" id="radio-worktype-Cleaning" @((job == null ? "" : job.WorkType == null ? "" : job.WorkType == ClassLibrary.Enum.WorkType.Cleaning.ToString() ? "checked" : "")) />
+                                <label for="radio-worktype-Cleaning">Cleaning</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="radio" name="sp1" value="@ClassLibrary.Enum.WorkType.MeetORgreet" class="radio-worktype" id="radio-worktype-Meet_Greet" @((job == null ? "" : job.WorkType == null ? "" : job.WorkType == ClassLibrary.Enum.WorkType.MeetORgreet.ToString() ? "checked" : "")) @((job == null ? "" : job.PropertyDetail == null ? "" : (job.PropertyDetail.PropertyType == ClassLibrary.Enum.PropertyType.Commercial.ToString() || job.PropertyDetail.PropertyType == ClassLibrary.Enum.PropertyType.Domestic.ToString()) ? "disabled" : "")) />
+                                <label for="radio-worktype-Meet_Greet">Meet/Greet</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.PropertyName, new { autocomplete = "off", placeholder = "Property Name", Name = "Property_PropertyName", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyName ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Property Name" name="prpertyname" id="user-job-prpertyname" />*@
+                        <span id="spn-Property_PropertyName" style="color:red;display:none;"></span>
+                    </div>
+
+                    <h4 class="form-title">Details</h4>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.FirstName, new { autocomplete = "off", placeholder = "First Name", Name = "Property_FirstName", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.FirstName ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="First Name" name="firstname" id="user-job-firstname" />*@
+                        <span id="spn-Property_FirstName" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.LastName, new { autocomplete = "off", placeholder = "Last Name", Name = "Property_LastName", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.LastName ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Last Name" name="lastname" id="user-job-lastname" />*@
+                        <span id="spn-Property_LastName" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.Phone, new { autocomplete = "off", placeholder = "Phone Number", Name = "Property_Phone", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.Phone ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Phone Number" name="phone" id="user-job-phone" />*@
+                        <span id="spn-Property_Phone" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-pad"></div>
+
+                    <div class="personal-details-no-icon">
+                        <span>Property Images</span>
+                    </div><!-- /personal-details -->
+
+                    <ul class="upload-imgs user-property-images-ul">
+                        @{
+                if (job != null)
+                {
+                    int count = 0;
+                    if (job.PropertyDetail != null)
+                    {
+                        if (job.PropertyDetail.PropertyImagesFile.Count > 0)
+                        {
+                            foreach (var property in job.PropertyDetail.PropertyImagesFile)
+                            {
+                                <li>
+                                    <input type="file" class="my_file1" style="display:none;" />
+                                    <input type="image" class="user-property-images" style="max-width: 76px;" src="@property.Filepath" />
+                                    <input type="hidden" class="hfn-base64" data-fileid="@property.Id" data-filepath="@property.Filepath" />
+                                </li>
+                                count++;
+                            }
+                            for (int i = 0; i < 4 - count; i++)
+                            {
+                                <li>
+                                    <input type="file" class="my_file1" style="display:none;" />
+                                    <input type="image" class="user-property-images" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                    <input type="hidden" class="hfn-base64" data-fileid="" data-filepath="" />
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                <li>
+                                    <input type="file" class="my_file1" style="display:none;" />
+                                    <input type="image" class="user-property-images" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                    <input type="hidden" class="hfn-base64" data-fileid="" data-filepath="" />
+                                </li>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            <li>
+                                <input type="file" class="my_file1" style="display:none;" />
+                                <input type="image" class="user-property-images" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                                <input type="hidden" class="hfn-base64" data-fileid="" data-filepath="" />
+                            </li>
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        <li>
+                            <input type="file" class="my_file1" style="display:none;" />
+                            <input type="image" class="user-property-images" style="max-width: 76px;" src="~/Content/images/add-images.png" />
+                            <input type="hidden" class="hfn-base64" data-fileid="" data-filepath="" />
+                        </li>
+                    }
+                }
+                        }
+                    </ul>
+
+                </div><!-- /col-md-4 -->
+
+                <div class="col-md-4">
+                    <div class="personal-details-no-icon">
+                        <span>Address Details</span>
+                    </div><!-- /personal-details -->
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.Address, new { autocomplete = "off", placeholder = "Address", Name = "Property_Address", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.Address ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Address" name="Address" id="user-job-Address" />*@
+                        <span id="spn-Property_Address" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.Suburb, new { autocomplete = "off", placeholder = "Suburb", Name = "Property_Suburb", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.Suburb ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Suburb" name="Suburb" id="user-job-Suburb" />*@
+                        <span id="spn-Property_Suburb" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.State, new { autocomplete = "off", placeholder = "State", Name = "Property_State", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.State ?? string.Empty) })
+                        <span id="spn-Property_State" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.Country, new { autocomplete = "off", placeholder = "", Name = "Property_Country", @class = "form-control", Value = "Australia", @readonly = "readonly" })
+                        @*<input type="text" class="form-control" value="Australia" name="Country" id="user-job-Country" />*@<!-- Dynamic -->
+                        <span id="spn-Property_Country" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-pad"></div>
+
+                    <div class="personal-details-no-icon">
+                        <span>When</span>
+                    </div><!-- /personal-details -->
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Date, new { autocomplete = "off", placeholder = "Date", Name = "date", @class = "form-control", Value = (job == null ? "" : job.DatetoBrowser.ToString("dd/MM/yyyy")) })
+                                @*<input type="text" class="form-control" placeholder="Date" id="date" name="date" />*@
+                                <span id="spn-date" style="color:red;display:none;"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Time, new { autocomplete = "off", placeholder = "Time", Name = "time", @class = "form-control time-picker1", Value = (job == null ? "" : job.DatetoBrowser.ToString("H:m")) })
+                                @*@Html.TextBoxFor(m => m.Time, new { autocomplete = "off", placeholder = "Time", Name = "time", @class = "form-control time-picker", Value = (job == null ? "" : job.DatetoBrowser.ToString("H:m")) })*@
+                                @*<input type="text" class="form-control time-picker" placeholder="Time" name="time" id="time" />*@
+                                <span id="spn-time" style="color:red;display:none;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-pad"></div>
+
+                </div><!-- /col-md-4 -->
+
+                <div class="col-md-4">
+                    <div class="personal-details-no-icon">
+                        <span>Type</span>
+                    </div><!-- /personal-details -->
+
+                    <div class="form-group">
+                        <select class="form-control" id="user-job-selct-propertytype">
+                            <option @((job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType == ClassLibrary.Enum.PropertyType.Airbnb.ToString() ? "selected" : "")) value="@ClassLibrary.Enum.PropertyType.Airbnb.ToString()">Airbnb</option>
+                            <option @((job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType == ClassLibrary.Enum.PropertyType.Domestic.ToString() ? "selected" : "")) value="@ClassLibrary.Enum.PropertyType.Domestic.ToString()">Domestic</option>
+                            <option @((job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.PropertyType == ClassLibrary.Enum.PropertyType.Commercial.ToString() ? "selected" : "")) value="@ClassLibrary.Enum.PropertyType.Commercial.ToString()">Commercial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextAreaFor(m => m.Instructions, new { autocomplete = "off", placeholder = "Instructions", Name = "Instructions", @class = "form-control", rows = "3" })
+                        @*<textarea rows="3" class="form-control" id="user-job-Instructions" name="Instructions" placeholder="Instructions"></textarea>*@
+                    </div>
+
+                    <div class="form-pad"></div>
+
+                    <div class="personal-details-no-icon">
+                        <span>Property Details</span>
+                    </div><!-- /personal-details -->
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.BedroomNum, new { autocomplete = "off", placeholder = "Bedrooms", Name = "Property_BedroomNum", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.BedroomNumString ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Bedrooms" name="Bedrooms" id="user-job-Bedrooms" />*@
+                        <span id="spn-Property_BedroomNum" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.Property.BathroomNum, new { autocomplete = "off", placeholder = "Bathrooms", Name = "Property_BathroomNum", @class = "form-control", Value = (job == null ? "" : job.PropertyDetail == null ? "" : job.PropertyDetail.BathroomNumString ?? string.Empty) })
+                        @*<input type="text" class="form-control" placeholder="Bathrooms" name="Bathrooms" id="user-job-Bathrooms" />*@
+                        <span id="spn-Property_BathroomNum" style="color:red;display:none;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextAreaFor(m => m.Property.Description, new { autocomplete = "off", placeholder = "Description", Name = "Property_Description", @class = "form-control", rows = "3" })
+                        <span id="spn-Property_Description" style="color:red;display:none;"></span>
+                        @*<textarea rows="3" class="form-control" placeholder="Description" name="Description" id="user-job-Description"></textarea>*@
+                    </div>
+
+                    <div class="form-pad"></div>
+
+                    @{
+                var cleanerList = new EntitiesLibrary.Data.WebService().fetchUserSelectedCleaners(Convert.ToInt64(Data.UserId)).ToList();
+                    }
+                    @if (cleanerList.Count > 0)
+                    {
+                        <div class="personal-details-no-icon">
+                            <span>Cleaner (Optional)</span>
+                        </div><!-- /personal-details -->
+
+                        <div class="form-group">
+                            <select class="form-control" id="slt-Selectedcleaner">
+                                <option value="0" data-cleanerid=" 0">Select cleaner</option>
+                                @{
+                        foreach (var item in cleanerList)
+                        {
+                            if (job != null)
+                            {
+                                <option value="@item.CLEANERID" @(item.CLEANERID == job.SelectedCleanerId ? "selected" : "") data-cleanerid="@item.CLEANERID" data-phone="@item.PHONE" data-pic="@item.PROFILEIMAGE">@item.FIRSTNAME @item.LASTNAME</option>
+                            }
+                            else
+                            {
+                                <option value="@item.CLEANERID" data-cleanerid="@item.CLEANERID" data-phone="@item.PHONE" data-pic="@item.PROFILEIMAGE">@item.FIRSTNAME @item.LASTNAME</option>
+                            }
+                        }
+                                }
+                            </select>
+                        </div>
+
+                        if (job != null)
+                        {
+                            if (job.SelectedCleanerId != 0)
+                            {
+                                if (job.SelectedCleanerDetails.Count > 0)
+                                {
+                                    var cleanerData = job.SelectedCleanerDetails.FirstOrDefault();
+
+                                    <div class="form-group" id="div-selected-cleaner">
+                                        <div class="cleaners">
+                                            <img class="img-responsive" id="img-pic" src="@cleanerData.PROFILEIMAGE">
+                                            <div class="cleanerName">
+                                                <h4 id="h4-cleanername">@cleanerData.FIRSTNAME @cleanerData.LASTNAME</h4>
+                                                <h5><i class="fa fa-phone"></i>&nbsp;<label id="lbl-phone"> @cleanerData.PHONE</label> </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+                            else
+                            {
+                                <div class="form-group" id="div-selected-cleaner" style="display:none;">
+                                    <div class="cleaners">
+                                        <img class="img-responsive" id="img-pic" src="">
+                                        <div class="cleanerName">
+                                            <h4 id="h4-cleanername">Cleaner</h4>
+                                            <h5><i class="fa fa-phone"></i>&nbsp;<label id="lbl-phone"> Phone</label> </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    }
+
+
+                </div><!-- /col-md-4 -->
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="form-pad"></div>
+                            <input type="button" value="Edit" id="btn-dummy-job-edit" class="btn btn-default view-job-btn view-btn" style="width:100%;" />
+                            <input type="submit" value="Edit" id="btn-job-edit" class="btn btn-default view-job-btn view-btn" style="width:100%;display:none;" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div><!-- /row -->
+
+        <div class="spacing"></div>
+
+        <br>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCR61VJlK15kYWdqQnUjyeAqylMYkugnfQ"></script>
+
+<script>
+    $(document).on('click', ".user-property-images", function (e) {
+        $(this).parent().find('.my_file1').click();
+        e.preventDefault();
+        //$("#imageUpload").click();
+    });
+
+
+    function previewPropertyImage(uploader, source) {
+        //ensure a file was selected
+        if (uploader.files && uploader.files[0]) {
+            var imageFile = uploader.files[0];
+            var fileType = imageFile["type"];
+            var ValidImageTypes = ["image/jpeg", "image/png"];
+
+            if ($.inArray(fileType, ValidImageTypes) < 0) {
+                toastr.error("Invalid file type");
+            }
+            else {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    //set the image data as source
+                    $(source).parent().find('.user-property-images').attr('src', e.target.result);
+                    $(source).parent().find('.hfn-base64').val(e.target.result);
+                    $('#IsNewProperty').val("true");
+                    //$('#ProfilePic').val(e.target.result);
+                }
+                reader.readAsDataURL(imageFile);
+            }
+        }
+    }
+
+    $(document).on('change', ".my_file1", function () {
+        previewPropertyImage(this, $(this));
+    });
+</script>
+
+
+<script>
+
+    $('#slt-Selectedcleaner').on('change', function () {
+        var source = $(this);
+        var cleanerId = $("#slt-Selectedcleaner option:selected").attr('data-cleanerid');
+        //$('#CleanerId').val(cleanerId);
+        var phone = $("#slt-Selectedcleaner option:selected").attr('data-phone');
+        var pic = $("#slt-Selectedcleaner option:selected").attr('data-pic');
+        var cleanerName = $("#slt-Selectedcleaner option:selected").text();
+        $('#NextCleanerId').val(cleanerId);
+        $('#hasMadeAnyChange').val(true);
+        if (cleanerId == 0) {
+            $('#lbl-phone').text(' Phone');
+            $('#h4-cleanername').text('Name');
+            $('#img-pic').attr("src", "/Content/images/icons/profile-icon.png");
+            $('#div-selected-cleaner').hide();
+
+        }
+        else {
+            $('#lbl-phone').text(' ' + phone);
+            $('#h4-cleanername').text(cleanerName);
+            $('#img-pic').attr("src", pic);
+            $('#div-selected-cleaner').show();
+        }
+    });
+
+</script>
+
+
+<script>
+
+
+    function getTimezoneName() {
+        timezone = jstz.determine();
+        return timezone.name();
+    }
+
+    $(document).ready(function () {
+        $('#TimeZone').val(getTimezoneName());
+    });
+
+    $(document).on('click', '.radio-worktype', function () {
+        var source = $(this);
+        $('#WorkType').val($(source).val());
+    });
+    $(document).on('click', '.radio-jobtype', function () {
+        var source = $(this);
+        $('#IsNewProperty').val("true");
+        $('#Property_JobType').val($(source).val());
+    });
+
+    $(document).on('change', '#user-job-selct-propertytype', function () {
+
+        var source = $(this);
+        var propertyTYpe = $(this).find(":selected").val();
+        $('#IsNewProperty').val("true");
+        if (propertyTYpe == '0') {
+            $("#radio-worktype-Meet_Greet , #radio-worktype-Cleaning").attr('disabled', false);
+        }
+        else {
+            $('#user-job-selct-propertytype').val(propertyTYpe);
+            $('#Property_PropertyType').val(propertyTYpe);
+            if (propertyTYpe == 'Domestic' || propertyTYpe == 'Commercial') {
+                $("#radio-worktype-Meet_Greet").prop("checked", false)
+                $("#radio-worktype-Meet_Greet").attr('disabled', true);
+                $("#radio-worktype-Cleaning").prop("checked", true)
+            }
+            else {
+                $("#radio-worktype-Meet_Greet").attr('disabled', false);
+            }
+        }
+
+    });
+
+    $(document).on('change', '#slct-user-property', function () {
+
+        var propertyId = $(this).find(":selected").val();
+        if (propertyId == "0") {
+            $('#IsNewProperty').val("true");
+            $('#PropertyId').val("0");
+        }
+        else {
+            $('#IsNewProperty').val("false");
+        }
+
+        //if (propertyId != "0") {
+        //    $('#IsNewProperty').val("false");
+        //}
+
+        if (propertyId != "0") {
+            $.ajax({
+                url: '/User/getPropertyByID/' + propertyId,
+                type: "GET",
+                dataType: 'json',
+                success: function (result) {
+                    if (result.Status) {
+                        var json = $.parseJSON(result.Data);
+                        //console.log(json);
+                        if (json != null) {
+                            if (json.JobTypeId == parseInt(2)) {
+                                $("#radio-jobtype-Business").prop("checked", true)
+                                $('#Property_JobType').val("Business");
+                            }
+                            else if (json.JobTypeId == parseInt(1)) {
+                                $("#radio-jobtype-Residential").prop("checked", true)
+                                $('#Property_JobType').val("Residential");
+                            }
+
+                            //$("#user-job-selct-propertytype option").each(function () {
+                            //    if ($(this).val() == json.PropertyType) {
+                            //        $(this).attr('selected', 'selected');
+                            //    }
+                            //});
+                            $('#user-job-selct-propertytype').val(json.PropertyType);
+                            $('#Property_PropertyType').val(json.PropertyType);
+
+                            if (json.PropertyType == '0') {
+                                $("#radio-worktype-Meet_Greet , #radio-worktype-Cleaning").attr('disabled', false);
+                            }
+                            else {
+                                if (json.PropertyType == 'Domestic' || json.PropertyType == 'Commercial') {
+                                    $("#radio-worktype-Meet_Greet").prop("checked", false)
+                                    $("#radio-worktype-Meet_Greet").attr('disabled', true);
+                                    $("#radio-worktype-Cleaning").prop("checked", true)
+                                    $('#WorkType').val('Cleaning');
+                                }
+                                else {
+                                    $("#radio-worktype-Meet_Greet").attr('disabled', false);
+                                }
+                            }
+
+
+                            $('#PropertyId').val(json.PropertyId);
+                            $('#Property_PropertyName').val(json.PropertyName);
+                            $('#Property_FirstName').val(json.FirstName);
+                            $('#Property_LastName').val(json.LastName);
+                            $('#Property_Phone').val(json.Phone);
+                            $('#Property_Address').val(json.Address);
+                            $('#Property_Suburb').val(json.Suburb);
+                            $('#Property_State').val(json.State);
+                            $('#Property_BedroomNum').val(json.BedroomNumString);
+                            $('#Property_BathroomNum').val(json.BathroomNumString);
+                            $('#Property_Description').val(json.Description);
+                            //$("#user-job-selct-property select").val(json.PropertyType);
+                            $("#user-job-selct-property").val(json.PropertyType);
+                            $('#Property_Latitude').val(json.Latitude);
+                            $('#Property_Longitude').val(json.Longitude);
+
+                            var template = "";
+                            $.each(json.PropertyImagesFile, function (i) {
+                                //template = template + '<li><input type="file" class="my_file" style="display:none;" /><input type="image" style="max-width: 76px;" class="user-property-images"data-src="" src="http://202.191.65.67:4106' + json.PropertyImages[i] + '" /></li>';
+                                template = template + '<li><input type="file" class="my_file1" style="display:none;" /><input type="image" style="max-width: 76px;" class="user-property-images" src= "' + json.PropertyImagesFile[i].Filepath + '"  /> <input type="hidden" class="hfn-base64" data-filepath="' + json.PropertyImagesFile[i].Filepath + '" data-fileid="' + json.PropertyImagesFile[i].Id + '"/></li>';
+                            });
+                            for (var i = 0; i < parseInt(4) - json.PropertyImagesFile.length; i++) {
+                                template = template + '<li> <input type="file" class="my_file1" style="display:none;" /><input type="image" class="user-property-images" style="max-width: 76px;" src="/Content/images/add-images.png" /><input type="hidden" class="hfn-base64" data-filepath="" data-fileid=""/></li>';
+                            }
+                            //console.log(template);
+                            $('.user-property-images-ul').html(template);
+
+                        }
+                    }
+                    else {
+                        toastr.error("An error has occured.pls try again");
+                    }
+                }
+            });
+        }
+
+    });
+
+
+    $(document).on('click', '#btn-dummy-job-edit', function () {
+        var status = true;
+        $('#user-edit-job-form input[type="text"], TextArea').each(function () {
+            if (this.name != "Instructions" && this.name != 'Property_PropertyName') {
+                if ($(this).val() != null && $(this).val() != "") {
+                    $(this).parent().find('#spn-' + this.name).hide();
+                }
+                else {
+                    $(this).parent().find('#spn-' + this.name).text("Required").show();
+                    status = false;
+                }
+            }
+        });
+
+        setTimeout(function () {
+            if (status) {
+
+                var obj = new Object();
+                obj.PropertyImagesList = [];
+
+                $('.user-property-images').each(function () {
+                    var currentElement = $(this);
+
+                    var value = $(currentElement).parent().find('.hfn-base64').val();
+                    var fileId = $(currentElement).parent().find('.hfn-base64').attr('data-fileid');
+                    var filepath = $(currentElement).parent().find('.hfn-base64').attr('data-filepath');
+                    var newobj = new Object();
+                    newobj.base64 = value;
+                    newobj.fileId = fileId;
+                    newobj.filepath = filepath;
+                    obj.PropertyImagesList.push(newobj);
+                });
+
+                obj.PropertyName = $('#Property_PropertyName').val();
+                obj.PropertyId = $('#PropertyId').val();
+                obj.FirstName = $('#Property_FirstName').val();
+                obj.LastName = $('#Property_LastName').val();
+                obj.Phone = $('#Property_Phone').val();
+                obj.Address = $('#Property_Address').val();
+                obj.Suburb = $('#Property_Suburb').val();
+                obj.State = $('#Property_State').val();
+                obj.Country = $('#Property_Country').val();
+                obj.BedroomNum = $('#Property_BedroomNum').val();
+                obj.BathroomNum = $('#Property_BathroomNum').val();
+                obj.Description = $('#Property_Description').val();
+                obj.IsJob = true;
+                obj.Latitude = $('#Property_Latitude').val();
+                obj.Longitude = $('#Property_Longitude').val();
+                obj.JobType = $('#Property_JobType').val();
+                //obj.PropertyType = $('#slct-user-property').find(":selected").val();
+                obj.PropertyType = $('#Property_PropertyType').val();
+
+                $('#PropertyString').val(JSON.stringify(obj));
+
+                $('#btn-dummy-job-edit').prop('disabled', true);
+                $('#btn-job-edit').trigger('click');
+                $(".preloder").show();
+            }
+
+        }, 300);
+
+    });
+
+
+
+    $(document).on('keydown', "#Property_Phone , #Price, #Property_BedroomNum , #Property_BathroomNum", function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+
+        if (this.name == 'Property_BathroomNum' || this.name == 'Property_BedroomNum' || this.name == 'Property_Phone') {
+            $('#IsNewProperty').val("true");
+        }
+
+    });
+
+
+    $(document).on('keydown', "#Property_PropertyName , #Property_FirstName, #Property_LastName , #Property_BathroomNum , #Property_Address , #Property_Suburb ,#Property_State,#Property_Description", function (e) {
+
+        $('#IsNewProperty').val("true");
+
+    });
+
+
+    function editjobSuccess(data) {
+        $(".preloder").fadeOut();
+        if (data.Status) {
+            toastr.success("Job edited");
+            setTimeout(function () {
+                window.location.href = "/User/viewjob/" + data.jobid;
+            }, 500);
+        }
+        else {
+            $('#btn-dummy-job-edit').prop('disabled', false);
+            toastr.error(data.Message);
+        }
+    }
+
+</script>
+
+
+<script>
+
+    var componentForm = {
+        street_number: 'long_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'long_name',
+        country: 'long_name',
+        postal_code: 'long_name',
+        neighborhood: 'long_name',
+        sublocality_level_3: 'long_name',
+        sublocality_level_2: 'long_name',
+        sublocality_level_1: 'long_name'
+    };
+
+
+    google.maps.event.addDomListener(window, 'load', function () {
+        var places = new google.maps.places.Autocomplete(document.getElementById('Property_Address'), { componentRestrictions: { country: 'au' } });
+        var cities = new google.maps.places.Autocomplete(document.getElementById('Property_Suburb'), { types: ['(cities)'], componentRestrictions: { country: 'au' } });
+        var state = new google.maps.places.Autocomplete(document.getElementById('Property_State'), { types: ['(regions)'], componentRestrictions: { country: 'au' } });
+        //var country = new google.maps.places.Autocomplete(document.getElementById('Country'), { types: ['(regions)'], componentRestrictions: { country: 'au' } });
+        google.maps.event.addListener(cities, 'place_changed', function () {
+            var cityFieldValue = $('#Property_Suburb').val();
+            cityFieldValue = cityFieldValue.substring(0, cityFieldValue.indexOf(','));
+            $('#Property_Suburb').val(cityFieldValue);
+        });
+        google.maps.event.addListener(state, 'place_changed', function () {
+            var stateFieldValue = $('#Property_State').val();
+            stateFieldValue = stateFieldValue.substring(0, stateFieldValue.indexOf(','));
+            $('#Property_State').val(stateFieldValue);
+        });
+        //google.maps.event.addListener(country, 'place_changed', function () {
+        //    var countryFieldValue = $('#Country').val();
+        //    $('#Country').val(countryFieldValue);
+        //});
+
+        google.maps.event.addListener(places, 'place_changed', function () {
+            var addressFieldValue = $('#Property_Address').val();
+            //$('#city').val('');
+            //$('#StreetNumber').val('');
+            //$('#country').val('');
+            //$('#postalCode').val('');
+            //$('#Route').val('');
+            //$('#UserLat').val('');
+            //$('#UserLong').val('');
+            var place = places.getPlace();
+            var address = place.formatted_address;
+            var latitude = place.geometry.location.lat();
+            var longitude = place.geometry.location.lng();
+            addressFieldValue = addressFieldValue.substring(0, addressFieldValue.indexOf(','));
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                //console.log(addressType);
+                if (addressType == "locality") {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    //console.log(val)
+                    $('#Property_Suburb').val(val);
+                }
+
+                if (addressType == "route") {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    //console.log(val)
+                }
+
+                //if (addressType == "postal_code") {
+                //    var val = place.address_components[i][componentForm[addressType]];
+                //    $('#Zip').val(val);
+                //    //console.log(val)
+                //}
+
+                if (addressType == "neighborhood") {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    //console.log(val)
+                }
+
+                if (addressType == "administrative_area_level_1") {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    //console.log(val)
+                    $('#Property_State').val(val);
+                }
+
+                //if (addressType == "country") {
+                //    var val = place.address_components[i][componentForm[addressType]];
+                //    //console.log(val)
+                //    $('#Country').val(val);
+                //}
+
+                if (addressType == "street_number") {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    //console.log(val)
+                    //$('#StreetNumber').val(val);
+                }
+
+            }
+            $('#Property_Address').val(addressFieldValue);
+            $('#Property_Latitude').val(latitude);
+            $('#Property_Longitude').val(longitude);
+            //var mesg = "Address: " + address;
+            //mesg += "\nLatitude: " + latitude;
+            //mesg += "\nLongitude: " + longitude;
+        });
+    });
+
+
+</script>
+
+<script src="~/Content/js/timepicker.js"></script>
+<script>
+    //$('.time-picker').timepicker();
+</script>
+
+<style>
+    .wickedpicker {
+        max-width: 164px;
+        max-height: 100px;
+    }
+</style>
+<link href="~/Content/Plugin/Timepicker/wickedpicker.css" rel="stylesheet" />
+<script src="~/Content/Plugin/Timepicker/wickedpicker.js"></script>
+
+<script type="text/javascript">
+    //console.log($('#Time').val())
+    $('.time-picker1').wickedpicker({
+        now: $('#Time').val(),
+        twentyFour: false, showSeconds: false
+    });
+    //    $('.timepicker-24').wickedpicker({twentyFour: true});
+</script>

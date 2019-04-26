@@ -1,0 +1,20 @@
+﻿@model ClassLibrary.WebModels.UserMyPropertiesPaginationModel
+@{
+    var Data = new EntitiesLibrary.Data.Registration((EntitiesLibrary.tRegistration)Session["AccountDetails"]);
+}
+@if (Model.currenttIndex > 0)
+{
+    <li><a class="a-user-myproperty-pageChange-prev" style="cursor:pointer;">Prev</a></li>
+}
+
+@if (Data != null)
+{
+    if (Data.UserProperties.Count > 0)
+    {
+        int index = Convert.ToInt32(Model.nextIndex);
+        if (Data.UserProperties.Skip(index * 6).Take(6).ToList().Count > 0)
+        {
+            <li><a class="a-user-myproperty-pageChange-next" style="cursor:pointer;">Next</a></li>
+        }
+    }
+}

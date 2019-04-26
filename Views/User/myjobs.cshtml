@@ -1,0 +1,463 @@
+﻿@model ClassLibrary.WebModels.UserMyJobsModel
+@{
+    ViewBag.Title = "myjob";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+@Html.HiddenFor(m => m.userId, new { Value = Model.userId })
+@Html.HiddenFor(m => m.index, new { Value = Model.index })
+@Html.HiddenFor(m => m.JobStatus, new { Value = Model.JobStatus })
+@Html.HiddenFor(m => m.propertyId, new { Value = Model.propertyId })
+@Html.HiddenFor(m => m.workType, new { Value = Model.workType })
+<section class="inner-pages">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="innr-pg-ttle">
+                    My Jobs
+                </div><!-- /innr-pg-ttle -->
+            </div><!-- /col-md-12 -->
+        </div><!-- /row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="innr-bdy-btn">
+                    <a class="active a-user-myjobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.fetchAll">Open Jobs</a>
+                    <a class="a-user-myjobs" style="cursor:pointer;" data-value="@ClassLibrary.Enum.JobStatus.Completed">Closed Jobs</a>
+                </div>
+            </div>
+        </div><!-- /row -->
+
+        <div id="div-openjob-filter" class="row">
+            <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                <div class="form-group">
+                    <select class="form-control" id="slct-user-property">
+                        <option value="0">Select my Property</option>
+                        @if (Model.UserProperties.Count > 0)
+                        {
+                            foreach (var property in Model.UserProperties)
+                            {
+                                <option value="@property.propertyId">@(property.propertyName ?? string.Empty)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div><!-- /col-lg-4 col-md-4 col-sm-5 col-xs-12 -->
+
+            <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                <div class="form-group" style="padding-top:10px;">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" class="radio-pending" id="pending" name="rp">
+                                <label for="pending">Pending</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" class="radio-accepted" id="accepted" name="rp">
+                                <label for="accepted">Accepted</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-4 col-md-4 col-sm-5 col-xs-12 -->
+
+            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-12">
+                <div class="form-group">
+                    <input type="submit" id="submit-openjobs-filter" value="Submit" class="btn btn-default view-btn">
+                </div>
+            </div><!-- /col-lg-4 col-md-4 col-sm-2 col-xs-12 -->
+        </div><!-- /row -->
+
+
+        <div id="div-closedjob-filter" class="row" style="display:none;">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="form-group">
+                    <select class="form-control" id="slct-user-property-completed">
+                        <option value="0">Select my Property</option>
+                        @if (Model.UserProperties.Count > 0)
+                        {
+                            foreach (var property in Model.UserProperties)
+                            {
+                                <option value="@property.propertyId">@(property.propertyName ?? string.Empty)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="form-group" style="padding-top:10px;">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" id="cleaning" class="radio-cleaning" name="cl">
+                                <label for="cleaning">Cleaning</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <input type="radio" id="meet" class="radio-meet" name="cl">
+                                <label for="meet">Meet/Greet</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            @*<input type="text" class="form-control" placeholder="Start Date" id="date" name="date">*@
+                            @Html.TextBoxFor(m => m.startDate, new { autocomplete = "off", placeholder = "Start Date", Name = "date", @class = "form-control" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            @*<input type="text" class="form-control" placeholder="End Date" id="date" name="date">*@
+                            @Html.TextBoxFor(m => m.endDate, new { autocomplete = "off", placeholder = "End Date", Name = "date", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <input type="submit" id="submit-closedjobs-filter" value="Submit" class="btn btn-default view-btn">
+                </div>
+            </div><!-- /col-lg-3 col-md-3 col-sm-3 col-xs-12 -->
+        </div><!-- /row -->
+
+        <div class="row" id="div-user-myjobs">
+            @Html.Partial("~/Views/User/_pv_User_Myjobs_list.cshtml", Model)
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pull-right pagination pagination-style" id="div-user-myjobs-pagination">
+                    @{
+                        var model = new ClassLibrary.WebModels.UserMyJobsPaginationModel();
+                        model.userId = Model.userId;
+                        model.currentIndex = Model.index;
+                        model.nextIndex = Model.index + 1;
+                        model.JobStatus = ClassLibrary.Enum.JobStatus.Pending;
+                    }
+                    @Html.Partial("~/Views/User/_pv_UserMyJobsPagination.cshtml", model)
+                </ul>
+            </div>
+        </div>
+    </div><!-- /container -->
+</section><!-- /main-banner -->
+
+<br><br><br><br>
+
+<script>
+    $(document).ready(function () {
+        var date_input = $('input[name="date"]'); //our date input has the name "date"
+        var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+        date_input.datepicker({
+            format: 'dd/mm/yyyy',
+            container: container,
+            todayHighlight: true,
+            autoclose: true
+        })
+    })
+</script>
+
+
+
+
+
+<script>
+
+    $(document).on('click', '.radio-accepted', function () {
+        $('#JobStatus').val("Accepted");
+    });
+    $(document).on('click', '.radio-pending', function () {
+        $('#JobStatus').val("Pending");
+    });
+
+    $(document).on('click', '.radio-cleaning', function () {
+        $('#workType').val("Cleaning");
+    });
+    $(document).on('click', '.radio-meet', function () {
+        $('#workType').val("MeetORgreet");
+    });
+
+
+    $(document).on('change', '#slct-user-property', function () {
+        var propertyId = $(this).find(":selected").val();
+        $('#propertyId').val(parseInt(propertyId));
+    });
+
+
+    $(document).on('change', '#slct-user-property-completed', function () {
+        var propertyId = $(this).find(":selected").val();
+        $('#propertyId').val(parseInt(propertyId));
+    });
+
+    $(document).on('click', '#submit-openjobs-filter', function () {
+        var userId = $('#userId').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.userId = userId;
+        obj.index = 0;
+        obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        obj.JobStatus = value;
+
+        $.ajax({
+            url: '/User/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-myjobs').html(data);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.userId = userId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.JobStatus = value;
+
+             
+                newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/User/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+
+    });
+
+    $(document).on('click', '#submit-closedjobs-filter', function () {
+        var userId = $('#userId').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.userId = userId;
+        obj.index = 0;
+        obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        obj.workType = $('#workType').val();
+        obj.JobStatus = value;
+
+        $.ajax({
+            url: '/User/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-myjobs').html(data);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.userId = userId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.JobStatus = value;
+
+
+                newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/User/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+
+    });
+
+
+    $(document).on('click', '.a-user-myjobs', function () {
+
+        var source = $(this);
+        var userId = $('#userId').val();
+        var value = $(this).attr('data-value');
+        var obj = new Object();
+        obj.userId = userId;
+        obj.index = 0;
+        if (value == "Completed")
+            obj.JobStatus = value;
+        else
+            obj.JobStatus = "fetchAll";
+        $('#propertyId').val(0);
+        $('#slct-user-property').val(0);
+        //$('#slct-user-property').text("Select my Property");
+        $('#slct-user-property-completed').val(0);
+        //$('#slct-user-property-completed').text("Select my Property");
+        obj.propertyId = $('#propertyId').val();
+        obj.startDate = $('#startDate').val();
+        obj.endDate = $('#endDate').val();
+        $('#workType').val("All");
+        obj.workType = $('#workType').val();
+
+        if ($(this).attr('data-value') == "Completed") {
+            $(document).find('#div-closedjob-filter').css('display', 'block');
+            $(document).find('#div-openjob-filter').css('display', 'none');
+        }
+        else {
+            $(document).find('#div-closedjob-filter').css('display', 'none');
+            $(document).find('#div-openjob-filter').css('display', 'block');
+        }
+
+        $.ajax({
+            url: '/User/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('.a-user-myjobs').removeClass('active');
+                $(source).addClass('active');
+                $('#div-user-myjobs').html(data);
+                $('#JobStatus').val(value);
+                $('#index').val(0)
+                var index = $('#index').val();
+
+                var newobj = new Object();
+                newobj.userId = userId;
+                newobj.currentIndex = parseInt(index);
+                newobj.nextIndex = parseInt(index) + parseInt(1);
+                newobj.JobStatus = value;
+
+                if (value == "Completed")
+                    newobj.JobStatus = value;
+                else
+                    newobj.JobStatus = "";
+                newobj.propertyId = $('#propertyId').val();
+                newobj.startDate = $('#startDate').val();
+                newobj.endDate = $('#endDate').val();
+                newobj.workType = $('#workType').val();
+
+                $.ajax({
+                    url: '/User/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+    });
+
+
+    $(document).on('click', '.a-user-myjob-pageChange-next', function () {
+
+        var source = $(this);
+        var userId = $('#userId').val();
+        var index = $('#index').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.userId = userId;
+        obj.index = parseInt(index) + parseInt(1);
+        obj.JobStatus = value;
+        $.ajax({
+            url: '/User/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-myjobs').html(data);
+
+                var newobj = new Object();
+                newobj.userId = userId;
+                newobj.currentIndex = parseInt(index) + parseInt(1);
+                newobj.nextIndex = parseInt(index) + parseInt(2);
+                newobj.JobStatus = value;
+
+                $.ajax({
+                    url: '/User/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+
+    });
+
+
+    $(document).on('click', '.a-user-myjob-pageChange-prev', function () {
+
+        var source = $(this);
+        var userId = $('#userId').val();
+        var index = $('#index').val();
+        var value = $('#JobStatus').val();
+        var obj = new Object();
+        obj.userId = userId;
+        obj.index = parseInt(index) - parseInt(1);
+        obj.JobStatus = value;
+        $.ajax({
+            url: '/User/RefreshMyJobsList',
+            type: "POST",
+            data: obj,
+            dataType: 'html',
+            success: function (data) {
+                $('#div-user-myjobs').html(data);
+
+                var newobj = new Object();
+                newobj.userId = userId;
+                newobj.currentIndex = parseInt(index) - parseInt(1);
+                newobj.nextIndex = parseInt(index) - parseInt(2);
+                newobj.JobStatus = value;
+                $.ajax({
+                    url: '/User/RefreshMyJobsListPagination',
+                    type: "POST",
+                    data: newobj,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#div-user-myjobs-pagination').html(result);
+                        $('#index').val(obj.index);
+                    }
+                });
+
+            }
+        });
+
+    });
+
+
+
+</script>
